@@ -1,0 +1,18 @@
+version: "3.7"
+
+services:
+  server: # app
+    image: video_1st_server
+    container_name: server
+    volumes:
+      - type: bind
+        source: ./src
+        target: /app/src
+    # depends_on:
+    # - db
+    # - redis
+    ports:
+      - 3001:3000
+    environment:
+      - "SECRETKEY=ssshhhhiiiii!"
+      - "PORT=3000"

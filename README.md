@@ -16,11 +16,13 @@ This is created based on tutorial on YouTube below:
 
 [Link](https://www.youtube.com/watch?v=oxFr7we3LC8)
 
-Also I added some extra feature including:
+Also I added some extra tech stacks including:
 
 - [TypeScript](https://www.typescriptlang.org/)
 
 - [Vite](https://vitejs.dev/)
+
+- [Docker](https://www.docker.com/)
 
 ### 2nd Project
 

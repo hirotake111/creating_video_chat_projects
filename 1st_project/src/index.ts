@@ -28,6 +28,7 @@ app.get("/", (req, res) => {
  * controllers for Socket.io
  */
 io.on("connection", (socket) => {
+  console.log("socket.io connected:", socket.handshake.address);
   // send user id to client first
   socket.emit("me", socket.id);
 
@@ -40,7 +41,7 @@ io.on("connection", (socket) => {
   socket.on("calluser", (callUserData: any) => {
     const { userToCall, signalData, from, name } =
       validateCallUserData(callUserData);
-    socket.to(userToCall).emit("answer", { signal: signalData, from, name });
+    socket.to(userToCall).emit("calluser", { signal: signalData, from, name });
   });
 
   // this gets kicked off when callee send answer
@@ -50,4 +51,4 @@ io.on("connection", (socket) => {
   });
 });
 
-app.listen(PORT, () => console.log(`✨ Listening on port ${PORT} ✨`));
+server.listen(PORT, () => console.log(`✨ Listening on port ${PORT} ✨`));

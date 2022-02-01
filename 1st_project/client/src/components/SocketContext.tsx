@@ -29,18 +29,18 @@ const ContextProvider = ({ children }: Props) => {
 
   useEffect(() => {
     // get and set media stream
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((currentStream) => {
-        // store current stream
-        setStream(currentStream);
-        if (myVideo.current) {
-          myVideo.current.srcObject = currentStream;
-        }
-      })
-      .catch((reason) => {
-        console.error("Error while getting media stream:", reason);
-      });
+    // navigator.mediaDevices
+    //   .getUserMedia({ video: true, audio: true })
+    //   .then((currentStream) => {
+    //     // store current stream
+    //     setStream(currentStream);
+    //     if (myVideo.current) {
+    //       myVideo.current.srcObject = currentStream;
+    //     }
+    //   })
+    //   .catch((reason) => {
+    //     console.error("Error while getting media stream:", reason);
+    //   });
 
     // me event handler
     socket.on("me", (id: string) => {

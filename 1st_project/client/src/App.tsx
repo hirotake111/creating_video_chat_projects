@@ -1,5 +1,6 @@
 import { Typography, AppBar } from "@mui/material";
-import "./App.modules.css";
+
+import "./App.css";
 import Notifications from "./components/Notifications";
 import Options from "./components/Options";
 import VideoPlayer from "./components/VideoPlayer";

@@ -12,7 +12,7 @@ services:
     # - db
     # - redis
     ports:
-      - 3001:3000
+      - 3001:3001
     environment:
       - "SECRETKEY=ssshhhhiiiii!"
-      - "PORT=3000"
+      - "PORT=3001"

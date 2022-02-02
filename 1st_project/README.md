@@ -24,7 +24,7 @@ cd client
 # install modules
 yarn
 # run dev server
-yarn dev
+yarn start
 # transpile code
 yarn build
 ```

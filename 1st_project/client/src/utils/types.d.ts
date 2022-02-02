@@ -12,3 +12,8 @@ export interface Call {
   name: string;
   signal: SignalData;
 }
+
+export interface Config {
+  myVideoOn: boolean;
+  peerVideoOn: boolean;
+}

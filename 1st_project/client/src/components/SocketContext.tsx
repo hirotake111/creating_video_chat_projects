@@ -49,7 +49,7 @@ const ContextProvider = ({ children }: Props) => {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [callerId, setCallerId] = useState<string>("");
   const [call, setCall] = useState<Call | null>(null);
-  const [name, setName] = useState("anonymous");
+  const [name, setName] = useState("");
   const [config, setConfig] = useState<Config>({
     myVideoOn: false,
     peerVideoOn: false,
@@ -77,6 +77,7 @@ const ContextProvider = ({ children }: Props) => {
 
     // me event handler
     socket.on("me", (id: string) => {
+      console.log("socket.io:name");
       // store user ID
       if (typeof id !== "string") {
         console.log("received ID is not string:", id);

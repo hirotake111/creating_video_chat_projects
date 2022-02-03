@@ -1,4 +1,4 @@
-import { Box, Grid, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import { useSocketContecxt } from "./SocketContext";
 
 export default function MyVideoPlayer() {

@@ -1,16 +1,17 @@
-import { useState } from "react";
-import { Typography, AppBar, Toolbar, Switch, Box } from "@mui/material";
+import { Typography, AppBar, Toolbar, Box } from "@mui/material";
 import VideoLibraryIcon from "@mui/icons-material/VideoLibrary";
 import { createTheme } from "@mui/material/styles";
 import { green, lightGreen } from "@mui/material/colors";
+import { ThemeProvider } from "@mui/system";
+
 import "./App.css";
 import Notifications from "./components/Notifications";
 import Options from "./components/Options";
 import VideoPlayer from "./components/VideoPlayer";
-import { ThemeProvider } from "@mui/system";
 import { useSocketContecxt } from "./components/SocketContext";
 import SettingsPane from "./components/SettingsPane";
 import MyVideoPlayer from "./components/MyVideoPlayer";
+import Landing from "./components/Landing";
 
 const theme = createTheme({
   palette: {
@@ -20,20 +21,12 @@ const theme = createTheme({
 });
 
 export default function App() {
-  const [videoOn, setVideoOn] = useState(false);
   const context = useSocketContecxt();
-
-  if (!context) return null;
-  const { switchMediaDevice, name } = context;
-
-  const handleChange = () => {
-    switchMediaDevice(!videoOn);
-    setVideoOn(!videoOn);
-  };
 
   return (
     <ThemeProvider theme={theme}>
       <div className="app">
+        <Landing />
         <AppBar position="static">
           <Toolbar sx={{ justifyContent: "space-between" }}>
             <div style={{ display: "flex", alignItems: "center" }}>
@@ -47,7 +40,7 @@ export default function App() {
                 Video Chat App
               </Typography>
             </div>
-            <Typography color="white">Hello {name}</Typography>
+            <Typography color="white">Hello {context?.name}</Typography>
           </Toolbar>
         </AppBar>
         <Box

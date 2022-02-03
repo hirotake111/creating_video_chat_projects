@@ -1,5 +1,5 @@
 import { Box, Switch, Typography } from "@mui/material";
-import { useState } from "react";
+import { ReactNode } from "react";
 import { useSocketContecxt } from "./SocketContext";
 
 export default function SettingsPane() {
@@ -7,7 +7,7 @@ export default function SettingsPane() {
   if (!context) return null;
   const { switchMediaDevice, config, setConfig } = context;
 
-  const handleChange = () => {
+  const handleVideo = () => {
     switchMediaDevice(!context.config.myVideoOn);
     setConfig({ ...config, myVideoOn: !config.myVideoOn });
   };
@@ -15,7 +15,14 @@ export default function SettingsPane() {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", padding: "16px" }}>
       <Typography variant="h5">Settings</Typography>
-      <Switch checked={config.myVideoOn} onChange={handleChange} />
+      <Setting>
+        <Typography>Video</Typography>
+        <Switch checked={config.myVideoOn} onChange={handleVideo} />
+      </Setting>
     </Box>
   );
 }
+
+const Setting = ({ children }: { children: ReactNode }) => (
+  <Box sx={{ display: "flex", alignItems: "center" }}>{children}</Box>
+);

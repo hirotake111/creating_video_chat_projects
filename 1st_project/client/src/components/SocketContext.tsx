@@ -16,6 +16,7 @@ import Peer from "simple-peer";
 import { config } from "../config";
 import { validateCallUserPayload } from "../utils/validator";
 import { Call, Config } from "../utils/types";
+import { useLocalStorage } from "../utils/hooks";
 
 interface ContextValues {
   stream: MediaStream | null;
@@ -43,13 +44,15 @@ interface Props {
 const ContextProvider = ({ children }: Props) => {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [call, setCall] = useState<Call | null>(null);
-  // const [name, setName] = useState("");
-  const [config, setConfig] = useState<Config>({
-    name: "",
-    id: "",
-    myVideoOn: false,
-    peerVideoOn: false,
-  });
+  const { value: config, update: setConfig } = useLocalStorage<Config>(
+    "config",
+    {
+      name: "",
+      id: "",
+      myVideoOn: false,
+      peerVideoOn: false,
+    }
+  );
   const [callAccepted, setCallAccepted] = useState<boolean>(false);
   const [callEnded, setCallEnded] = useState<boolean>(true);
   const myVideo = useRef<HTMLVideoElement>(null);

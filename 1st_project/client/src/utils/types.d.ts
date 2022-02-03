@@ -14,6 +14,8 @@ export interface Call {
 }
 
 export interface Config {
+  name: string;
+  id: string;
   myVideoOn: boolean;
   peerVideoOn: boolean;
 }

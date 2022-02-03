@@ -40,7 +40,7 @@ export default function App() {
                 Video Chat App
               </Typography>
             </div>
-            <Typography color="white">Hello {context?.name}</Typography>
+            <Typography color="white">Hello {context?.config.name}</Typography>
           </Toolbar>
         </AppBar>
         <Box

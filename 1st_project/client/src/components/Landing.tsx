@@ -1,12 +1,7 @@
 import { Box, TextField } from "@mui/material";
-import { ChangeEventHandler, FormEventHandler, useMemo, useRef } from "react";
-import { nanoid } from "nanoid";
+import { FormEventHandler, useMemo, useRef } from "react";
 
 import { useSocketContecxt } from "./SocketContext";
-
-interface Props {
-  onChange: () => void;
-}
 
 export default function Landing() {
   const context = useSocketContecxt();
@@ -15,15 +10,20 @@ export default function Landing() {
   const handleChange: FormEventHandler = (e) => {
     e.preventDefault();
     if (!ref.current?.value) {
-      console.log("empty value -> skip setting name");
-      return;
+      return console.log("empty value -> skip setting name");
     }
+    if (!context) {
+      return console.log("empty config");
+    }
+
+    const { config, setConfig } = context;
+
     // set username
-    context?.setName(ref.current.value);
+    setConfig({ ...config, name: ref.current.value });
   };
 
   const nameEntered = useMemo(
-    () => context?.name && context.name.length > 0,
+    () => context?.config.name && context.config.name.length > 0,
     [context]
   );
 

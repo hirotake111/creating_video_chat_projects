@@ -20,8 +20,6 @@ import { Call, Config } from "../utils/types";
 interface ContextValues {
   stream: MediaStream | null;
   call: Call | null;
-  name: string;
-  setName: (name: string) => void;
   callAccepted: boolean;
   callEnded: boolean;
   myVideo: RefObject<HTMLVideoElement>;
@@ -30,9 +28,6 @@ interface ContextValues {
   callUser: (id: string) => void;
   answerCall: () => void;
   leaveCall: () => void;
-  /**
-   * This gets media stream and set it to myVideo ref object
-   */
   switchMediaDevice: (on: boolean) => void;
   config: Config;
   setConfig: (config: Config) => void;
@@ -47,10 +42,11 @@ interface Props {
 
 const ContextProvider = ({ children }: Props) => {
   const [stream, setStream] = useState<MediaStream | null>(null);
-  const [callerId, setCallerId] = useState<string>("");
   const [call, setCall] = useState<Call | null>(null);
-  const [name, setName] = useState("");
+  // const [name, setName] = useState("");
   const [config, setConfig] = useState<Config>({
+    name: "",
+    id: "",
     myVideoOn: false,
     peerVideoOn: false,
   });
@@ -77,25 +73,21 @@ const ContextProvider = ({ children }: Props) => {
 
     // me event handler
     socket.on("me", (id: string) => {
-      console.log("socket.io:name");
+      console.log("socket.io:me");
       // store user ID
       if (typeof id !== "string") {
         console.log("received ID is not string:", id);
         return;
       }
-      setCallerId(id);
+      setConfig({ ...config, id });
     });
 
     // calluser event handler
     socket.on("calluser", (payload) => {
       // validate name
-      const {
-        from,
-        name: callerName,
-        signal,
-      } = validateCallUserPayload(payload);
+      const { from, name, signal } = validateCallUserPayload(payload);
       // set call
-      setCall({ isReceivedCall: true, from, name: callerName, signal });
+      setCall({ isReceivedCall: true, from, name, signal });
     });
   }, []);
 
@@ -139,6 +131,7 @@ const ContextProvider = ({ children }: Props) => {
    * initiates a call
    */
   const callUser = (calleeId: string) => {
+    console.log("calluser()");
     // check to see if user have media stream and call
     if (!stream) {
       throw new Error("Media stream is null.");
@@ -150,7 +143,12 @@ const ContextProvider = ({ children }: Props) => {
     const peer = new Peer({ initiator: true, trickle: false, stream });
     // once user receives a signal, then do the followings
     peer.on("signal", (signal) => {
-      socket.emit("calluser", { callerId, callerName: name, signal, calleeId });
+      socket.emit("calluser", {
+        callerId: config.id,
+        callerName: config.name,
+        signal,
+        calleeId,
+      });
     });
     // once user receives media stream, then do the followings
     peer.on("stream", (mediaStream) => {
@@ -213,8 +211,6 @@ const ContextProvider = ({ children }: Props) => {
       value={{
         stream,
         call,
-        name,
-        setName,
         callAccepted,
         callEnded,
         myVideo,

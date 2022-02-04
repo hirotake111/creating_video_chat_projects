@@ -24,7 +24,6 @@ interface ContextValues {
   name: string;
   setName: (name: string) => void;
   id: string;
-  setId: (newId: string) => void;
   roster: Roster;
   callAccepted: boolean;
   callEnded: boolean;
@@ -37,6 +36,7 @@ interface ContextValues {
   switchMediaDevice: (on: boolean) => void;
   config: Config;
   setConfig: (config: Config) => void;
+  calling: boolean;
 }
 
 const SocketContext = createContext<ContextValues | null>(null);
@@ -57,6 +57,7 @@ interface Props {
 const ContextProvider = ({ children }: Props) => {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [call, setCall] = useState<Call | null>(null);
+  const [calling, setCalling] = useState<boolean>(false);
   const { value: config, update: setConfig } = useLocalStorage<Config>(
     "config",
     { myVideoOn: false, peerVideoOn: false }
@@ -103,6 +104,7 @@ const ContextProvider = ({ children }: Props) => {
     socket.on("rosterUpdate", (roster: Roster) => {
       console.log("roster updated");
       console.log({ roster });
+      console.log("before update roster", { id });
       setRoster(roster);
     });
 
@@ -113,13 +115,16 @@ const ContextProvider = ({ children }: Props) => {
 
     // me event handler
     socket.on("me", (newId: string) => {
-      console.log("socket.io:me");
+      console.log("socket.io:me", newId);
       // store user ID
       if (typeof id !== "string") {
         console.log("received ID is not string:", id);
         return;
       }
-      if (newId !== id) setId(id);
+      if (newId !== id) {
+        console.log("set new ID:", newId);
+        setId(newId);
+      }
     });
 
     // calluser event handler
@@ -171,14 +176,16 @@ const ContextProvider = ({ children }: Props) => {
    * initiates a call
    */
   const callUser = async (calleeId: string) => {
-    console.log("calluser()");
+    console.log(`calling user '${calleeId}'`);
+    // update calling status
+    setCalling(true);
     // check to see if user have media stream and call
     // if (!stream) {
     // throw new Error("Media stream is null.");
     // }
-    if (!call) {
-      throw new Error("Call is an empty object.");
-    }
+    // if (!call) {
+    //   throw new Error("Call is an empty object.");
+    // }
     // create a new peer
     const peer = new Peer({
       initiator: true,
@@ -250,11 +257,11 @@ const ContextProvider = ({ children }: Props) => {
       value={{
         stream,
         id,
-        setId,
         name,
         setName,
         roster,
         call,
+        calling,
         callAccepted,
         callEnded,
         myVideo,

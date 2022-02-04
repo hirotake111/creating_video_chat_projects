@@ -34,6 +34,7 @@ app.get("/", (req, res) => {
 io.on("connection", (socket) => {
   console.log("socket.io connected:", socket.id);
   // send user id to client first
+  console.log("sending user id:", socket.id);
   socket.emit("me", socket.id);
 
   // disconnect handler

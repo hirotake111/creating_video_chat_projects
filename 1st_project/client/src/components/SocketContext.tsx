@@ -15,7 +15,7 @@ import Peer from "simple-peer";
 
 import { config } from "../config";
 import { validateCallUserPayload } from "../utils/validator";
-import { Call, Config } from "../utils/types";
+import { Call, Config, Roster } from "../utils/types";
 import { useLocalStorage } from "../utils/hooks";
 
 interface ContextValues {
@@ -25,6 +25,7 @@ interface ContextValues {
   setName: (name: string) => void;
   id: string;
   setId: (newId: string) => void;
+  roster: Roster;
   callAccepted: boolean;
   callEnded: boolean;
   myVideo: RefObject<HTMLVideoElement>;
@@ -64,6 +65,7 @@ const ContextProvider = ({ children }: Props) => {
   const { value: name, update: setName } = useLocalStorage<string>("name", "");
   const [callAccepted, setCallAccepted] = useState<boolean>(false);
   const [callEnded, setCallEnded] = useState<boolean>(true);
+  const [roster, setRoster] = useState<Roster>({});
   const myVideo = useRef<HTMLVideoElement>(null);
   const peerVideo = useRef<HTMLVideoElement>(null);
   const connectionRef = useRef<Peer.Instance | null>(null);
@@ -98,9 +100,10 @@ const ContextProvider = ({ children }: Props) => {
     //   console.log("onAny:", { data });
     // });
 
-    socket.on("rosterUpdate", (roster) => {
+    socket.on("rosterUpdate", (roster: Roster) => {
       console.log("roster updated");
       console.log({ roster });
+      setRoster(roster);
     });
 
     // When reconnected, send username again
@@ -250,6 +253,7 @@ const ContextProvider = ({ children }: Props) => {
         setId,
         name,
         setName,
+        roster,
         call,
         callAccepted,
         callEnded,

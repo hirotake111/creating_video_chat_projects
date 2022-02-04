@@ -17,3 +17,7 @@ export interface Config {
   myVideoOn: boolean;
   peerVideoOn: boolean;
 }
+
+export interface Roster {
+  [key: string]: string;
+}

@@ -13,6 +13,7 @@ import SettingsPane from "./components/SettingsPane";
 import MyVideoPlayer from "./components/MyVideoPlayer";
 import Landing from "./components/Landing";
 import VideoController from "./components/VideoController";
+import UserList from "./components/Roster";
 
 const theme = createTheme({
   palette: {
@@ -56,8 +57,21 @@ export default function App() {
               <MyVideoPlayer />
               <VideoPlayer />
             </Box>
-            <Box sx={{ width: "360px" }}>
-              <SettingsPane />
+            <Box
+              sx={{ display: "flex", flexDirection: "column", width: "360px" }}
+            >
+              <Box sx={{ flex: 1, transition: "1s" }}>
+                <SettingsPane />
+              </Box>
+              <Box
+                sx={{
+                  flex: 1,
+                  borderTop: "1px solid #e0e0e0",
+                  borderBottom: "1px solid #e0e0e0",
+                }}
+              >
+                <UserList />
+              </Box>
             </Box>
           </Box>
           <Box

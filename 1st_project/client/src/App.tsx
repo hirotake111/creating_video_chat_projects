@@ -8,10 +8,11 @@ import "./App.css";
 import Notifications from "./components/Notifications";
 import Options from "./components/Options";
 import VideoPlayer from "./components/VideoPlayer";
-import { useSocketContecxt } from "./components/SocketContext";
+import { useSocketContext } from "./components/SocketContext";
 import SettingsPane from "./components/SettingsPane";
 import MyVideoPlayer from "./components/MyVideoPlayer";
 import Landing from "./components/Landing";
+import VideoController from "./components/VideoController";
 
 const theme = createTheme({
   palette: {
@@ -21,7 +22,7 @@ const theme = createTheme({
 });
 
 export default function App() {
-  const context = useSocketContecxt();
+  const context = useSocketContext();
 
   return (
     <ThemeProvider theme={theme}>
@@ -40,7 +41,7 @@ export default function App() {
                 Video Chat App
               </Typography>
             </div>
-            <Typography color="white">Hello {context?.config.name}</Typography>
+            <Typography color="white">Hello {context?.name}</Typography>
           </Toolbar>
         </AppBar>
         <Box
@@ -61,9 +62,14 @@ export default function App() {
           </Box>
           <Box
             aria-label="controllers"
-            sx={{ height: "128px", backgroundColor: "yellow" }}
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "128px",
+            }}
           >
-            controllers
+            <VideoController />
           </Box>
           <Box sx={{ height: "128px", color: "#fff", backgroundColor: "blue" }}>
             <Options>

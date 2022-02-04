@@ -21,6 +21,10 @@ import { useLocalStorage } from "../utils/hooks";
 interface ContextValues {
   stream: MediaStream | null;
   call: Call | null;
+  name: string;
+  setName: (name: string) => void;
+  id: string;
+  setId: (newId: string) => void;
   callAccepted: boolean;
   callEnded: boolean;
   myVideo: RefObject<HTMLVideoElement>;
@@ -35,7 +39,15 @@ interface ContextValues {
 }
 
 const SocketContext = createContext<ContextValues | null>(null);
-const socket = io(config.serverUrl);
+const socket = io(config.serverUrl, { autoConnect: true });
+
+const constraints: MediaStreamConstraints = {
+  audio: true,
+  video: {
+    width: 1024, //1280,
+    height: 576, //720,
+  },
+};
 
 interface Props {
   children: ReactNode;
@@ -46,13 +58,10 @@ const ContextProvider = ({ children }: Props) => {
   const [call, setCall] = useState<Call | null>(null);
   const { value: config, update: setConfig } = useLocalStorage<Config>(
     "config",
-    {
-      name: "",
-      id: "",
-      myVideoOn: false,
-      peerVideoOn: false,
-    }
+    { myVideoOn: false, peerVideoOn: false }
   );
+  const [id, setId] = useState<string>("");
+  const { value: name, update: setName } = useLocalStorage<string>("name", "");
   const [callAccepted, setCallAccepted] = useState<boolean>(false);
   const [callEnded, setCallEnded] = useState<boolean>(true);
   const myVideo = useRef<HTMLVideoElement>(null);
@@ -60,6 +69,15 @@ const ContextProvider = ({ children }: Props) => {
   const connectionRef = useRef<Peer.Instance | null>(null);
 
   useEffect(() => {
+    if (name.length === 0) return;
+    console.log("sending username:", name);
+    socket.emit("newUser", name);
+  }, [name]);
+
+  useEffect(() => {
+    console.log("useEffect()");
+    console.log("id:", id);
+
     // get and set media stream
     // navigator.mediaDevices
     //   .getUserMedia({ video: true, audio: true })
@@ -74,15 +92,31 @@ const ContextProvider = ({ children }: Props) => {
     //     console.error("Error while getting media stream:", reason);
     //   });
 
+    // // debug
+    // console.log("registering event listener");
+    // socket.onAny((data) => {
+    //   console.log("onAny:", { data });
+    // });
+
+    socket.on("rosterUpdate", (roster) => {
+      console.log("roster updated");
+      console.log({ roster });
+    });
+
+    // When reconnected, send username again
+    socket.io.on("reconnect", () => {
+      socket.emit("newUser", name);
+    });
+
     // me event handler
-    socket.on("me", (id: string) => {
+    socket.on("me", (newId: string) => {
       console.log("socket.io:me");
       // store user ID
       if (typeof id !== "string") {
         console.log("received ID is not string:", id);
         return;
       }
-      setConfig({ ...config, id });
+      if (newId !== id) setId(id);
     });
 
     // calluser event handler
@@ -92,7 +126,7 @@ const ContextProvider = ({ children }: Props) => {
       // set call
       setCall({ isReceivedCall: true, from, name, signal });
     });
-  }, []);
+  }, [config, setConfig]);
 
   /**
    * answer incoming call
@@ -133,22 +167,28 @@ const ContextProvider = ({ children }: Props) => {
   /**
    * initiates a call
    */
-  const callUser = (calleeId: string) => {
+  const callUser = async (calleeId: string) => {
     console.log("calluser()");
     // check to see if user have media stream and call
-    if (!stream) {
-      throw new Error("Media stream is null.");
-    }
+    // if (!stream) {
+    // throw new Error("Media stream is null.");
+    // }
     if (!call) {
       throw new Error("Call is an empty object.");
     }
     // create a new peer
-    const peer = new Peer({ initiator: true, trickle: false, stream });
+    const peer = new Peer({
+      initiator: true,
+      trickle: false,
+      stream: stream
+        ? stream
+        : await navigator.mediaDevices.getUserMedia(constraints),
+    });
     // once user receives a signal, then do the followings
     peer.on("signal", (signal) => {
       socket.emit("calluser", {
-        callerId: config.id,
-        callerName: config.name,
+        callerId: id,
+        callerName: name,
         signal,
         calleeId,
       });
@@ -183,13 +223,6 @@ const ContextProvider = ({ children }: Props) => {
    * This gets media stream and set it to myVideo ref object
    */
   const switchMediaDevice = (on: boolean) => {
-    const constraints: MediaStreamConstraints = {
-      audio: true,
-      video: {
-        width: 1024, //1280,
-        height: 576, //720,
-      },
-    };
     if (on) {
       // turn on camera
       navigator.mediaDevices.getUserMedia(constraints).then((mediaStream) => {
@@ -213,6 +246,10 @@ const ContextProvider = ({ children }: Props) => {
     <SocketContext.Provider
       value={{
         stream,
+        id,
+        setId,
+        name,
+        setName,
         call,
         callAccepted,
         callEnded,
@@ -232,5 +269,5 @@ const ContextProvider = ({ children }: Props) => {
   );
 };
 
-const useSocketContecxt = () => useContext(SocketContext);
-export { ContextProvider, useSocketContecxt };
+const useSocketContext = () => useContext(SocketContext);
+export { ContextProvider, useSocketContext };

@@ -5,7 +5,11 @@ import { Server } from "socket.io";
 import { validateAnswerData, validateCallUserData } from "./validators";
 
 const PORT = process.env.PORT || "3000";
-
+/**
+ * key: userId,
+ * value: userName
+ */
+const roster: { [key: string]: string } = {};
 const app = express();
 const server = createServer(app);
 const io = new Server(server, {
@@ -28,13 +32,24 @@ app.get("/", (req, res) => {
  * controllers for Socket.io
  */
 io.on("connection", (socket) => {
-  console.log("socket.io connected:", socket.handshake.address);
+  console.log("socket.io connected:", socket.id);
   // send user id to client first
   socket.emit("me", socket.id);
 
   // disconnect handler
   socket.on("disconnect", () => {
+    console.log(`${roster[socket.id]} is disconnected`);
     socket.broadcast.emit("callended");
+    delete roster[socket.id];
+    console.log("roster", roster);
+    io.emit("rosterUpdate", roster);
+  });
+
+  // when user sets username, add it to roster and advertise it all users
+  socket.on("newUser", (username: string) => {
+    roster[socket.id] = username;
+    console.log("roster update:", roster);
+    io.emit("rosterUpdate", roster);
   });
 
   // custom hander "calluser"

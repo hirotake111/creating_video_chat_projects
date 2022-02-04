@@ -1,10 +1,10 @@
 import { Box, TextField } from "@mui/material";
 import { FormEventHandler, useMemo, useRef } from "react";
 
-import { useSocketContecxt } from "./SocketContext";
+import { useSocketContext } from "./SocketContext";
 
 export default function Landing() {
-  const context = useSocketContecxt();
+  const context = useSocketContext();
   const ref = useRef<HTMLInputElement>(null);
 
   const handleChange: FormEventHandler = (e) => {
@@ -16,14 +16,13 @@ export default function Landing() {
       return console.log("empty config");
     }
 
-    const { config, setConfig } = context;
-
+    const { setName } = context;
     // set username
-    setConfig({ ...config, name: ref.current.value });
+    setName(ref.current.value);
   };
 
   const nameEntered = useMemo(
-    () => context?.config.name && context.config.name.length > 0,
+    () => context?.name && context?.name.length > 0,
     [context]
   );
 

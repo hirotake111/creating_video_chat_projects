@@ -1,8 +1,8 @@
 import { Box } from "@mui/material";
-import { useSocketContecxt } from "./SocketContext";
+import { useSocketContext } from "./SocketContext";
 
 export default function MyVideoPlayer() {
-  const context = useSocketContecxt();
+  const context = useSocketContext();
 
   return (
     <Box

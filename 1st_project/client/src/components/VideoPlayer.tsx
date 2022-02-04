@@ -1,8 +1,8 @@
 import { Grid } from "@mui/material";
-import { useSocketContecxt } from "./SocketContext";
+import { useSocketContext } from "./SocketContext";
 
 export default function VideoPlayer() {
-  const context = useSocketContecxt();
+  const context = useSocketContext();
 
   return (
     <>

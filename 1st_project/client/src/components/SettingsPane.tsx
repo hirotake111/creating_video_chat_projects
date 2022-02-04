@@ -1,9 +1,9 @@
 import { Box, Switch, Typography } from "@mui/material";
 import { ReactNode } from "react";
-import { useSocketContecxt } from "./SocketContext";
+import { useSocketContext } from "./SocketContext";
 
 export default function SettingsPane() {
-  const context = useSocketContecxt();
+  const context = useSocketContext();
   if (!context) return null;
   const { switchMediaDevice, config, setConfig } = context;
 

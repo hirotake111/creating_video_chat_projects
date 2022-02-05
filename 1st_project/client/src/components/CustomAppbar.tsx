@@ -6,7 +6,7 @@ export default function CustomAppBar() {
   const context = useSocketContext();
 
   return (
-    <AppBar position="static">
+    <AppBar position="absolute">
       <Toolbar sx={{ justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center" }}>
           <VideoLibraryIcon sx={{ mr: 2, color: "#fff" }} />

@@ -28,4 +28,10 @@ export interface Roster {
   [key: string]: string;
 }
 
-export type CallStatus = "available" | "calling" | "ringing" | "onCall";
+export type CallStatus =
+  | "notSignedIn"
+  | "available"
+  | "beforeCalling"
+  | "calling"
+  | "ringing"
+  | "onCall";

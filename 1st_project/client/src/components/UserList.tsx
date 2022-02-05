@@ -25,7 +25,7 @@ export default function UserList() {
         }}
       >
         {callStatus === "available" ? (
-          <List sx={{ width: "50%", padding: "64px" }}>
+          <List sx={{ width: "50%", paddingTop: "128px" }}>
             {userIds.length < 2 ? (
               <Box
                 sx={{

@@ -20,28 +20,30 @@ export default function Landing() {
       return console.log("empty config");
     }
 
-    const { setName } = context;
+    const { setName, setCallStatus } = context;
     // set username
     setName(ref.current.value);
+    setCallStatus("available");
   };
 
-  const nameEntered = useMemo(
-    () => context?.name && context?.name.length > 0,
-    [context]
+  const signedIn = useMemo(
+    () => context?.callStatus !== "notSignedIn",
+    [context?.callStatus]
   );
 
   return (
     <Box
+      aria-label="sign in"
       sx={{
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
         width: "100vw",
-        height: nameEntered ? "0vh" : "100vh",
+        height: context?.callStatus !== "notSignedIn" ? "0%" : "100%",
         transition: "0.3s",
       }}
     >
-      {!nameEntered && (
+      {!(context?.callStatus !== "notSignedIn") && (
         <form onSubmit={handleChange}>
           <TextField label="Enter Your Name" inputRef={ref} focused />
         </form>

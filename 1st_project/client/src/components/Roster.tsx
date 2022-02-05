@@ -36,7 +36,9 @@ export default function UserList() {
                   <div key={i}>
                     <ListItemButton
                       sx={{ display: "flex", justifyContent: "space-between" }}
-                      onClick={() => callUser(userId)}
+                      onClick={() =>
+                        callUser({ id: userId, name: roster[userId] })
+                      }
                     >
                       <Typography>{roster[userId]}</Typography>
                       <LocalPhoneIcon />

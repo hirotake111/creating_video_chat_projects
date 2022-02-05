@@ -1,11 +1,15 @@
 import { Box, TextField } from "@mui/material";
-import { FormEventHandler, useMemo, useRef } from "react";
+import { FormEventHandler, useEffect, useMemo, useRef } from "react";
 
 import { useSocketContext } from "./SocketContext";
 
 export default function Landing() {
   const context = useSocketContext();
   const ref = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    ref.current?.focus();
+  }, [ref]);
 
   const handleChange: FormEventHandler = (e) => {
     e.preventDefault();
@@ -39,7 +43,7 @@ export default function Landing() {
     >
       {!nameEntered && (
         <form onSubmit={handleChange}>
-          <TextField label="Enter Your Name" inputRef={ref} />
+          <TextField label="Enter Your Name" inputRef={ref} focused />
         </form>
       )}
     </Box>

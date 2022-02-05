@@ -9,20 +9,6 @@ export default function VideoController() {
 
   const handleSubmit: FormEventHandler = (e) => {
     e.preventDefault();
-    callUser();
-  };
-
-  const callUser = () => {
-    if (!ref.current?.value) {
-      return console.log("empty ref");
-    }
-
-    if (ref.current.value.length < 4) {
-      return console.log("ID to call is invalid");
-    }
-
-    console.log(ref.current.value);
-    context?.callUser(ref.current.value);
   };
 
   return (
@@ -34,7 +20,7 @@ export default function VideoController() {
           size="small"
           sx={{ paddingRight: "8px" }}
         />
-        <Button color="primary" variant="outlined" onClick={callUser}>
+        <Button color="primary" variant="outlined">
           Call
         </Button>
       </FormControl>

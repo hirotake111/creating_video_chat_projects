@@ -14,8 +14,8 @@ import { io } from "socket.io-client";
 import Peer from "simple-peer";
 
 import { config } from "../config";
-import { validateCallUserPayload } from "../utils/validator";
-import { Call, Config, Roster } from "../utils/types";
+import { validateCallUserMessage } from "../utils/validator";
+import { Call, CallUserMessage, Config, Roster } from "../utils/types";
 import { useLocalStorage } from "../utils/hooks";
 
 interface ContextValues {
@@ -30,7 +30,7 @@ interface ContextValues {
   myVideo: RefObject<HTMLVideoElement>;
   peerVideo: RefObject<HTMLVideoElement>;
   connectionRef: RefObject<Peer.Instance>;
-  callUser: (id: string) => void;
+  callUser: (callee: { id: string; name: string }) => Promise<void>;
   answerCall: () => void;
   leaveCall: () => void;
   switchMediaDevice: (on: boolean) => void;
@@ -41,6 +41,10 @@ interface ContextValues {
 
 const SocketContext = createContext<ContextValues | null>(null);
 const socket = io(config.serverUrl, { autoConnect: true });
+// debugging purpose
+socket.onAny((data) => {
+  console.log("onAny:", { data });
+});
 
 const constraints: MediaStreamConstraints = {
   audio: true,
@@ -95,16 +99,11 @@ const ContextProvider = ({ children }: Props) => {
     //     console.error("Error while getting media stream:", reason);
     //   });
 
-    // // debug
-    // console.log("registering event listener");
-    // socket.onAny((data) => {
-    //   console.log("onAny:", { data });
-    // });
+    // debug
+    console.log("registering event listener");
 
     socket.on("rosterUpdate", (roster: Roster) => {
-      console.log("roster updated");
-      console.log({ roster });
-      console.log("before update roster", { id });
+      console.log("roster updated:", { roster });
       setRoster(roster);
     });
 
@@ -128,11 +127,12 @@ const ContextProvider = ({ children }: Props) => {
     });
 
     // calluser event handler
-    socket.on("calluser", (payload) => {
+    socket.on("callUser", (payload) => {
+      console.log("socket.on(callUser):", { payload });
       // validate name
-      const { from, name, signal } = validateCallUserPayload(payload);
+      const { caller, callee, signal } = validateCallUserMessage(payload);
       // set call
-      setCall({ isReceivedCall: true, from, name, signal });
+      setCall({ isReceivedCall: true, caller, callee, signal });
     });
   }, [config, setConfig]);
 
@@ -151,14 +151,19 @@ const ContextProvider = ({ children }: Props) => {
     if (!call) {
       throw new Error("Call is an empty object.");
     }
-    // create a new peer
+
+    /**
+     * create a new peer
+     */
     const peer = new Peer({ initiator: false, trickle: false, stream });
     // once user receives a signal, then do the followings
     peer.on("signal", (signal) => {
-      socket.emit("answercall", { signal, to: call.from });
+      console.log("peer.on(signal) received");
+      socket.emit("answerCall", { signal, caller: call.caller });
     });
     // once user receives media stream, then do the followings
     peer.on("stream", (mediaStream) => {
+      console.log("peer on stream received");
       // check to see if peerRef is attached to vide element
       if (!peerVideo.current) {
         throw new Error("peerVideo is not set");
@@ -175,50 +180,56 @@ const ContextProvider = ({ children }: Props) => {
   /**
    * initiates a call
    */
-  const callUser = async (calleeId: string) => {
-    console.log(`calling user '${calleeId}'`);
+  const callUser = async (callee: { id: string; name: string }) => {
+    console.log(`calling user '${callee.id}'`);
     // update calling status
     setCalling(true);
-    // check to see if user have media stream and call
-    // if (!stream) {
-    // throw new Error("Media stream is null.");
-    // }
-    // if (!call) {
-    //   throw new Error("Call is an empty object.");
-    // }
-    // create a new peer
+    /**
+     * create a new peer
+     * this will initiate comminucation between ICE server
+     * and create SDP offer
+     * then peer.on("signal") event listener will be kicked
+     */
     const peer = new Peer({
       initiator: true,
       trickle: false,
-      stream: stream
-        ? stream
-        : await navigator.mediaDevices.getUserMedia(constraints),
+      stream: stream || undefined,
     });
-    // once user receives a signal, then do the followings
+    console.log("peer created");
+    // // once user receives a signal, then do the followings
     peer.on("signal", (signal) => {
-      socket.emit("calluser", {
-        callerId: id,
-        callerName: name,
-        signal,
-        calleeId,
-      });
+      // signal should be {type: "offer", sdp:"....."}
+      socket.emit(
+        "callUser",
+        validateCallUserMessage({
+          caller: { id, name },
+          callee,
+          signal,
+        } as CallUserMessage)
+      );
     });
-    // once user receives media stream, then do the followings
-    peer.on("stream", (mediaStream) => {
-      // check to see if peerRef is attached to vide element
-      if (!peerVideo.current) {
-        throw new Error("peerVideo is not set");
-      }
-      // set media stream
-      peerVideo.current.srcObject = mediaStream;
-    });
-    peer.on("callaccepted", (signal) => {
-      setCallAccepted(true);
-      // send a signal
-      peer.signal(signal);
-      // preserve peer connection
-      connectionRef.current = peer;
-    });
+
+    // // once user receives media stream, then do the followings
+    // peer.on("stream", (mediaStream) => {
+    //   console.log("peer on stream received");
+
+    //   // check to see if peerRef is attached to vide element
+    //   if (!peerVideo.current) {
+    //     throw new Error("peerVideo is not set");
+    //   }
+    //   // set media stream
+    //   peerVideo.current.srcObject = mediaStream;
+    // });
+
+    // peer.on("callAccepted", (signal) => {
+    //   console.log("peer on callAccedpted received");
+
+    //   setCallAccepted(true);
+    //   // send a signal
+    //   peer.signal(signal);
+    //   // preserve peer connection
+    //   connectionRef.current = peer;
+    // });
   };
 
   const leaveCall = () => {

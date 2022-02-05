@@ -1,11 +1,18 @@
-export interface CallUserData {
-  userToCall: string;
-  signalData: any;
-  from: string;
-  name: string;
+import { SignalData } from "simple-peer";
+
+export interface CallUserMessage {
+  caller: {
+    id: string;
+    name: string;
+  };
+  callee: {
+    id: string;
+    name: string;
+  };
+  signal: SignalData;
 }
 
-export interface AnswerData {
-  to: string;
+export interface AnswerMessage {
+  caller: { id: string; name: string };
   signal: any;
 }

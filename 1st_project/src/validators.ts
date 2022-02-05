@@ -1,30 +1,41 @@
-import { AnswerData, CallUserData } from "./types";
+import { AnswerMessage, CallUserMessage } from "./types";
 
-const getValidationError = (msg: string): Error => {
-  return new Error(`validation error. ${msg}`);
+const getError = (message: string) => {
+  return new Error(`Validation error: ${message}`);
 };
 
-export const validateCallUserData = (data: any): CallUserData => {
-  if (!data) throw getValidationError("data is undefined or null");
-  const { userToCall, signalData, from, name } = data as CallUserData;
-  if (typeof userToCall !== "string")
-    throw getValidationError("'serToCall' should be string");
-  if (typeof signalData === "undefined")
-    throw getValidationError("'signalData' should not be undefined");
-  if (typeof from !== "string")
-    throw getValidationError("'from' should be string");
-  if (typeof name !== "string")
-    throw getValidationError("'name' should be string");
+export const validateCallUserMessage = (data: any): CallUserMessage => {
+  if (!data) throw getError("data is undefined or null");
+  const { callee, caller, signal } = data as CallUserMessage;
+  if (
+    !(
+      caller &&
+      typeof caller.id === "string" &&
+      typeof caller.name === "string"
+    )
+  )
+    throw getError(`invalid 'caller' object: : ${JSON.stringify(caller)}`);
+  if (
+    !(
+      callee &&
+      typeof callee.id === "string" &&
+      typeof callee.name === "string"
+    )
+  )
+    throw getError(`invalid 'callee' object: : ${JSON.stringify(callee)}}`);
+  if (!(signal && typeof signal.type === "string" && typeof signal))
+    throw getError(`invalid 'signal' object: ${JSON.stringify(signal)}`);
 
-  return { userToCall, signalData, from, name };
+  return { caller, callee, signal };
 };
 
-export const validateAnswerData = (data: any): AnswerData => {
-  if (!data) throw getValidationError("data is undefined or null");
-  const { to, signal } = data as AnswerData;
-  if (typeof to !== "string")
-    throw getValidationError("'from' shold be string");
-  if (typeof signal === "undefined")
-    throw getValidationError("'signal' should not be undefined");
-  return { to, signal };
+export const validateAnswerData = (data: any): AnswerMessage => {
+  if (!data) throw getError("data is undefined or null");
+  const { caller, signal } = data as AnswerMessage;
+  if (!(caller && typeof caller.id === "string" && typeof caller.name))
+    throw getError(`invalid 'caller' object: ${JSON.stringify(caller)}`);
+  if (!(signal && typeof signal.type === "string"))
+    throw getError(`invalid 'signal' object: ${JSON.stringify(signal)}`);
+
+  return { caller, signal };
 };

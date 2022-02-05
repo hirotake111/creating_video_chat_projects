@@ -2,7 +2,7 @@ import express from "express";
 import { createServer } from "http";
 import cors from "cors";
 import { Server } from "socket.io";
-import { validateAnswerData, validateCallUserData } from "./validators";
+import { validateAnswerData, validateCallUserMessage } from "./validators";
 
 const PORT = process.env.PORT || "3000";
 /**
@@ -34,8 +34,13 @@ app.get("/", (req, res) => {
 io.on("connection", (socket) => {
   console.log("socket.io connected:", socket.id);
   // send user id to client first
-  console.log("sending user id:", socket.id);
+  // console.log("sending user id:", socket.id);
   socket.emit("me", socket.id);
+
+  // debuggingg purpose
+  socket.onAny((event) => {
+    console.log("event:", { event });
+  });
 
   // disconnect handler
   socket.on("disconnect", () => {
@@ -53,17 +58,28 @@ io.on("connection", (socket) => {
     io.emit("rosterUpdate", roster);
   });
 
-  // custom hander "calluser"
-  socket.on("calluser", (callUserData: any) => {
-    const { userToCall, signalData, from, name } =
-      validateCallUserData(callUserData);
-    socket.to(userToCall).emit("calluser", { signal: signalData, from, name });
+  // this will send 'callUser' message to callee
+  socket.on("callUser", (callUserData: any) => {
+    console.log("socket.on(callUser)");
+    try {
+      const { caller, callee, signal } = validateCallUserMessage(callUserData);
+      console.log(JSON.stringify(callee));
+      socket.to(callee.id).emit("callUser", { caller, callee, signal });
+    } catch (e) {
+      // send error message back to sender
+      socket.emit(`server erorr: ${e}`);
+    }
   });
 
   // this gets kicked off when callee send answer
-  socket.on("answer", (answerData: any) => {
-    const { to, signal } = validateAnswerData(answerData);
-    socket.to(to).emit("callaccepted", signal);
+  socket.on("answerCall", (answerData: any) => {
+    try {
+      const { caller, signal } = validateAnswerData(answerData);
+      socket.to(caller.id).emit("callAccepted", signal);
+    } catch (e) {
+      // send error message back to sender
+      socket.emit(`server erorr: ${e}`);
+    }
   });
 });
 

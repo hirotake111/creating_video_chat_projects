@@ -1,15 +1,21 @@
 import { SignalData } from "simple-peer";
 
-export interface CallUserPayload {
-  from: string;
-  name: string;
+export interface CallUserMessage {
+  caller: {
+    id: string;
+    name: string;
+  };
+  callee: {
+    id: string;
+    name: string;
+  };
   signal: SignalData;
 }
 
 export interface Call {
   isReceivedCall: boolean;
-  from: string;
-  name: string;
+  caller: { id: string; name: string };
+  callee: { id: string; name: string };
   signal: SignalData;
 }
 

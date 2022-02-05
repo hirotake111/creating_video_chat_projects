@@ -27,3 +27,5 @@ export interface Config {
 export interface Roster {
   [key: string]: string;
 }
+
+export type CallStatus = "available" | "calling" | "ringing" | "onCall";

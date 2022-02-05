@@ -15,7 +15,13 @@ import Peer from "simple-peer";
 
 import { config } from "../config";
 import { validateCallUserMessage } from "../utils/validator";
-import { Call, CallUserMessage, Config, Roster } from "../utils/types";
+import {
+  Call,
+  CallStatus,
+  CallUserMessage,
+  Config,
+  Roster,
+} from "../utils/types";
 import { useLocalStorage } from "../utils/hooks";
 
 interface ContextValues {
@@ -37,6 +43,8 @@ interface ContextValues {
   config: Config;
   setConfig: (config: Config) => void;
   calling: boolean;
+  callStatus: CallStatus;
+  setCallStatus: (newStatus: CallStatus) => void;
 }
 
 const SocketContext = createContext<ContextValues | null>(null);
@@ -74,6 +82,7 @@ const ContextProvider = ({ children }: Props) => {
   const myVideo = useRef<HTMLVideoElement>(null);
   const peerVideo = useRef<HTMLVideoElement>(null);
   const connectionRef = useRef<Peer.Instance | null>(null);
+  const [callStatus, setCallStatus] = useState<CallStatus>("available");
 
   useEffect(() => {
     if (name.length === 0) return;
@@ -82,20 +91,6 @@ const ContextProvider = ({ children }: Props) => {
   }, [name]);
 
   useEffect(() => {
-    // get and set media stream
-    // navigator.mediaDevices
-    //   .getUserMedia({ video: true, audio: true })
-    //   .then((currentStream) => {
-    //     // store current stream
-    //     setStream(currentStream);
-    //     if (myVideo.current) {
-    //       myVideo.current.srcObject = currentStream;
-    //     }
-    //   })
-    //   .catch((reason) => {
-    //     console.error("Error while getting media stream:", reason);
-    //   });
-
     // debug
     console.log("registering event listener");
 
@@ -178,7 +173,8 @@ const ContextProvider = ({ children }: Props) => {
   const callUser = async (callee: { id: string; name: string }) => {
     console.log(`calling user '${callee.id}'`);
     // update calling status
-    setCalling(true);
+    // setCalling(true);
+    setCallStatus("calling");
     /**
      * create a new peer
      * this will initiate comminucation between ICE server
@@ -279,6 +275,8 @@ const ContextProvider = ({ children }: Props) => {
         switchMediaDevice,
         config,
         setConfig,
+        callStatus,
+        setCallStatus,
       }}
     >
       {children}

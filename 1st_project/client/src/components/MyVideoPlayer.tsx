@@ -9,7 +9,7 @@ export default function MyVideoPlayer() {
       sx={{
         position: "absolute",
         bottom: "64px",
-        right: "64px",
+        left: "64px",
       }}
     >
       {context?.config.myVideoOn && (

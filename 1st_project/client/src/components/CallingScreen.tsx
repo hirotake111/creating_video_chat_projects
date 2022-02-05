@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 
 import { useSocketContext } from "./SocketContext";
@@ -10,7 +10,7 @@ export default function CallingScreen() {
     return null;
   }
 
-  const { callStatus, name } = context;
+  const { callStatus, call } = context;
 
   return (
     <Box
@@ -21,17 +21,41 @@ export default function CallingScreen() {
         alignItems: "center",
         width: "100%",
         height:
-          callStatus === "beforeCalling"
+          callStatus.type === "beforeCalling"
             ? "100%"
-            : callStatus === "calling"
+            : callStatus.type === "calling"
             ? "100%"
             : "0%",
         transition: "0.3s",
+        backgroundColor: "#000",
       }}
     >
-      {callStatus === "calling" ? (
-        <Box>Calling {name}</Box>
-      ) : callStatus === "beforeCalling" ? (
+      {callStatus.type === "calling" ? (
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              justfiyContent: "center",
+              backgroundColor: "#009688",
+              padding: "16px",
+              borderRadius: "100%",
+              border: "5px solid #fff",
+              marginBottom: "16px",
+            }}
+          >
+            <img src="/me.png" alt="person" width="128px" />
+          </Box>
+          <Typography variant="h5" color="#fff">
+            Calling {callStatus.callee.name}...
+          </Typography>
+        </Box>
+      ) : callStatus.type === "beforeCalling" ? (
         <CircularProgress />
       ) : null}
     </Box>

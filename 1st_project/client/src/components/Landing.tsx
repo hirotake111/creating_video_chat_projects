@@ -23,11 +23,11 @@ export default function Landing() {
     const { setName, setCallStatus } = context;
     // set username
     setName(ref.current.value);
-    setCallStatus("available");
+    setCallStatus({ type: "available" });
   };
 
   const signedIn = useMemo(
-    () => context?.callStatus !== "notSignedIn",
+    () => context?.callStatus.type !== "notSignedIn",
     [context?.callStatus]
   );
 
@@ -39,11 +39,11 @@ export default function Landing() {
         justifyContent: "center",
         alignItems: "center",
         width: "100vw",
-        height: context?.callStatus !== "notSignedIn" ? "0%" : "100%",
+        height: context?.callStatus.type !== "notSignedIn" ? "0%" : "100%",
         transition: "0.3s",
       }}
     >
-      {!(context?.callStatus !== "notSignedIn") && (
+      {!(context?.callStatus.type !== "notSignedIn") && (
         <form onSubmit={handleChange}>
           <TextField label="Enter Your Name" inputRef={ref} focused />
         </form>

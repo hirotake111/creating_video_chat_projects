@@ -29,9 +29,9 @@ export interface Roster {
 }
 
 export type CallStatus =
-  | "notSignedIn"
-  | "available"
-  | "beforeCalling"
-  | "calling"
-  | "ringing"
-  | "onCall";
+  | { type: "notSignedIn" }
+  | { type: "available" }
+  | { type: "beforeCalling" }
+  | { type: "calling"; callee: { id: string; name: string } }
+  | { type: "ringing" }
+  | { type: "onCall" };

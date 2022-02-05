@@ -82,13 +82,15 @@ const ContextProvider = ({ children }: Props) => {
   const myVideo = useRef<HTMLVideoElement>(null);
   const peerVideo = useRef<HTMLVideoElement>(null);
   const connectionRef = useRef<Peer.Instance | null>(null);
-  const [callStatus, setCallStatus] = useState<CallStatus>("notSignedIn");
+  const [callStatus, setCallStatus] = useState<CallStatus>({
+    type: "notSignedIn",
+  });
 
   useEffect(() => {
     if (name.length === 0) return;
     console.log("sending username:", name);
     socket.emit("newUser", name);
-    setCallStatus("available");
+    setCallStatus({ type: "available" });
   }, [name]);
 
   useEffect(() => {
@@ -175,7 +177,7 @@ const ContextProvider = ({ children }: Props) => {
     console.log(`calling user '${callee.id}'`);
     // update calling status
     // setCalling(true);
-    setCallStatus("beforeCalling");
+    setCallStatus({ type: "beforeCalling" });
     /**
      * create a new peer
      * this will initiate comminucation between ICE server
@@ -199,7 +201,7 @@ const ContextProvider = ({ children }: Props) => {
           signal,
         } as CallUserMessage)
       );
-      setCallStatus("calling");
+      setCallStatus({ type: "calling", callee });
     });
 
     // // once user receives media stream, then do the followings

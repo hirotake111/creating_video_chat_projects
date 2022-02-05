@@ -19,12 +19,12 @@ export default function UserList() {
           display: "flex",
           justifyContent: "center",
           // alignItems: "center",
-          height: callStatus === "available" ? "100vh" : "0vh",
+          height: callStatus.type === "available" ? "100vh" : "0vh",
           // height: `${h}vh`,
           transition: "0.3s",
         }}
       >
-        {callStatus === "available" ? (
+        {callStatus.type === "available" ? (
           <List sx={{ width: "50%", paddingTop: "128px" }}>
             {userIds.length < 2 ? (
               <Box

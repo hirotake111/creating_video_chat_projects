@@ -1,6 +1,6 @@
 import { Box, SpeedDial } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
-import { green, lightGreen } from "@mui/material/colors";
+import { green, teal, lightGreen } from "@mui/material/colors";
 import { ThemeProvider } from "@mui/system";
 
 import "./App.css";
@@ -15,7 +15,7 @@ import CallingScreen from "./components/CallingScreen";
 
 const theme = createTheme({
   palette: {
-    primary: green,
+    primary: teal,
     secondary: lightGreen,
   },
 });

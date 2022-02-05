@@ -6,7 +6,6 @@ import { ThemeProvider } from "@mui/system";
 
 import "./App.css";
 import Notifications from "./components/Notifications";
-import Options from "./components/Options";
 import VideoPlayer from "./components/VideoPlayer";
 import { useSocketContext } from "./components/SocketContext";
 import SettingsPane from "./components/SettingsPane";
@@ -85,10 +84,14 @@ export default function App() {
           >
             <VideoController />
           </Box>
-          <Box sx={{ height: "128px", color: "#fff", backgroundColor: "blue" }}>
-            <Options>
-              <Notifications />
-            </Options>
+          <Box
+            sx={{
+              height: "128px",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <Notifications />
           </Box>
         </Box>
       </div>

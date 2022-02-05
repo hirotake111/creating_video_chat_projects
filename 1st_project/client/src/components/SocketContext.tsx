@@ -42,8 +42,8 @@ interface ContextValues {
 const SocketContext = createContext<ContextValues | null>(null);
 const socket = io(config.serverUrl, { autoConnect: true });
 // debugging purpose
-socket.onAny((data) => {
-  console.log("onAny:", { data });
+socket.onAny((event) => {
+  console.log("onAny:", { event });
 });
 
 const constraints: MediaStreamConstraints = {
@@ -82,9 +82,6 @@ const ContextProvider = ({ children }: Props) => {
   }, [name]);
 
   useEffect(() => {
-    console.log("useEffect()");
-    console.log("id:", id);
-
     // get and set media stream
     // navigator.mediaDevices
     //   .getUserMedia({ video: true, audio: true })
@@ -107,20 +104,10 @@ const ContextProvider = ({ children }: Props) => {
       setRoster(roster);
     });
 
-    // When reconnected, send username again
-    socket.io.on("reconnect", () => {
-      socket.emit("newUser", name);
-    });
-
     // me event handler
     socket.on("me", (newId: string) => {
       console.log("socket.io:me", newId);
-      // store user ID
-      if (typeof id !== "string") {
-        console.log("received ID is not string:", id);
-        return;
-      }
-      if (newId !== id) {
+      if (newId.length > 0) {
         console.log("set new ID:", newId);
         setId(newId);
       }
@@ -133,8 +120,16 @@ const ContextProvider = ({ children }: Props) => {
       const { caller, callee, signal } = validateCallUserMessage(payload);
       // set call
       setCall({ isReceivedCall: true, caller, callee, signal });
+      //
     });
   }, [config, setConfig]);
+
+  useEffect(() => {
+    // When reconnected, send username again
+    socket.io.on("reconnect", () => {
+      socket.emit("newUser", name);
+    });
+  }, [name]);
 
   /**
    * answer incoming call

@@ -118,7 +118,8 @@ const ContextProvider = ({ children }: Props) => {
       const { caller, callee, signal } = validateCallUserMessage(payload);
       // set call
       setCall({ isReceivedCall: true, caller, callee, signal });
-      //
+      // update call status
+      setCallStatus({ type: "receivingCall", caller });
     });
   }, [config, setConfig]);
 

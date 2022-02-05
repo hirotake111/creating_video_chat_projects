@@ -10,7 +10,10 @@ export default function CallingScreen() {
     return null;
   }
 
-  const { callStatus, call } = context;
+  const { callStatus } = context;
+  console.log({ callStatus });
+
+  const statusTypes = ["beforeCalling", "calling", "receivingCall"];
 
   return (
     <Box
@@ -20,17 +23,12 @@ export default function CallingScreen() {
         justifyContent: "center",
         alignItems: "center",
         width: "100%",
-        height:
-          callStatus.type === "beforeCalling"
-            ? "100%"
-            : callStatus.type === "calling"
-            ? "100%"
-            : "0%",
+        height: statusTypes.includes(callStatus.type) ? "100%" : "0%",
         transition: "0.3s",
         backgroundColor: "#000",
       }}
     >
-      {callStatus.type === "calling" ? (
+      {callStatus.type === "calling" || callStatus.type === "receivingCall" ? (
         <Box
           sx={{
             display: "flex",
@@ -51,9 +49,16 @@ export default function CallingScreen() {
           >
             <img src="/me.png" alt="person" width="128px" />
           </Box>
-          <Typography variant="h5" color="#fff">
-            Calling {callStatus.callee.name}...
-          </Typography>
+          {callStatus.type === "calling" ? (
+            <Typography variant="h5" color="#fff">
+              Calling {callStatus.callee.name}...
+            </Typography>
+          ) : (
+            <Typography variant="h5" color="#fff">
+              Call from {callStatus.caller.name}
+            </Typography>
+          )}
+          :
         </Box>
       ) : callStatus.type === "beforeCalling" ? (
         <CircularProgress />

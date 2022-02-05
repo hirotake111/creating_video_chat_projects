@@ -33,5 +33,5 @@ export type CallStatus =
   | { type: "available" }
   | { type: "beforeCalling" }
   | { type: "calling"; callee: { id: string; name: string } }
-  | { type: "ringing" }
+  | { type: "receivingCall"; caller: { id: string; name: string } }
   | { type: "onCall" };

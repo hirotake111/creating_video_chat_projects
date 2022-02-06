@@ -22,7 +22,7 @@ import {
   Config,
   Roster,
 } from "../utils/types";
-import { useLocalStorage } from "../utils/hooks";
+import { useLocalStorage, useMediaStream } from "../utils/hooks";
 
 interface ContextValues {
   stream: MediaStream | undefined;
@@ -38,12 +38,13 @@ interface ContextValues {
   callUser: (callee: { id: string; name: string }) => Promise<void>;
   answerCall: (caller: { id: string; name: string }) => Promise<void>;
   leaveCall: () => void;
-  switchMediaDevice: (on: boolean) => void;
   config: Config;
   setConfig: (config: Config) => void;
   calling: boolean;
   callStatus: CallStatus;
   setCallStatus: (newStatus: CallStatus) => void;
+  switchAudio: (enabled: boolean) => Promise<void>;
+  switchVideo: (enabled: boolean) => Promise<void>;
 }
 
 const SocketContext = createContext<ContextValues | null>(null);
@@ -66,7 +67,14 @@ interface Props {
 }
 
 const ContextProvider = ({ children }: Props) => {
-  const [stream, setStream] = useState<MediaStream | undefined>(undefined);
+  // const [stream, setStream] = useState<MediaStream | undefined>(undefined);
+  const {
+    stream,
+    ref: myVideo,
+    getStream,
+    switchAudio,
+    switchVideo,
+  } = useMediaStream();
   const [call, setCall] = useState<Call | null>(null);
   const [calling, setCalling] = useState<boolean>(false);
   const [config, setConfig] = useState<Config>({
@@ -77,7 +85,7 @@ const ContextProvider = ({ children }: Props) => {
   const { value: name, update: setName } = useLocalStorage<string>("name", "");
   const [callEnded, setCallEnded] = useState<boolean>(true);
   const [roster, setRoster] = useState<Roster>({});
-  const myVideo = useRef<HTMLVideoElement>(null);
+  // const myVideo = useRef<HTMLVideoElement>(null);
   const peerVideo = useRef<HTMLVideoElement>(null);
   const connectionRef = useRef<Peer.Instance | null>(null);
   const [callStatus, setCallStatus] = useState<CallStatus>({
@@ -149,8 +157,7 @@ const ContextProvider = ({ children }: Props) => {
     // get media stream
     let mediaStream: MediaStream | undefined;
     try {
-      mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-      setStream(mediaStream);
+      await getStream();
     } catch (e) {
       console.error("Failed to get media stream. Reason:", e);
     }
@@ -196,6 +203,7 @@ const ContextProvider = ({ children }: Props) => {
     // update calling status
     // setCalling(true);
     setCallStatus({ type: "beforeCalling" });
+
     /**
      * create a new peer
      * this will initiate comminucation between ICE server
@@ -253,34 +261,6 @@ const ContextProvider = ({ children }: Props) => {
     window.location.reload();
   };
 
-  /**
-   * This gets media stream and set it to myVideo ref object
-   */
-  const switchMediaDevice = (on: boolean) => {
-    if (on) {
-      // turn on camera
-      navigator.mediaDevices.getUserMedia(constraints).then((mediaStream) => {
-        setStream(mediaStream);
-        if (myVideo.current) {
-          // display video
-          myVideo.current.srcObject = mediaStream;
-          // setConfig({ ...config, myVideoOn: true });
-        }
-      });
-    } else {
-      // turn off
-      if (myVideo.current) {
-        myVideo.current.srcObject = null;
-        // setConfig({ ...config, myVideoOn: false });
-      }
-      // stop video
-      stream?.getVideoTracks().forEach((track) => {
-        track.stop();
-      });
-      setStream(undefined);
-    }
-  };
-
   return (
     <SocketContext.Provider
       value={{
@@ -298,7 +278,8 @@ const ContextProvider = ({ children }: Props) => {
         callUser,
         answerCall,
         leaveCall,
-        switchMediaDevice,
+        switchAudio,
+        switchVideo,
         config,
         setConfig,
         callStatus,

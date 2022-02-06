@@ -5,10 +5,10 @@ import { useSocketContext } from "./SocketContext";
 export default function SettingsPane() {
   const context = useSocketContext();
   if (!context) return null;
-  const { switchMediaDevice, config, setConfig } = context;
+  const { config, setConfig, switchVideo } = context;
 
   const handleVideo = () => {
-    switchMediaDevice(!context.config.myVideoOn);
+    switchVideo(!context.config.myVideoOn);
     setConfig({ ...config, myVideoOn: !config.myVideoOn });
   };
 

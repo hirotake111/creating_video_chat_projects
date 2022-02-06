@@ -25,7 +25,7 @@ export default function CustomSpeedDial() {
             ...context.config,
             myVideoOn: !context.config.myVideoOn,
           });
-          context?.switchMediaDevice(!context.config.myVideoOn);
+          context?.switchVideo(!context.config.myVideoOn);
         }}
       />
     </SpeedDial>

@@ -1,6 +1,6 @@
-import { Box, SpeedDial } from "@mui/material";
+import { Box } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
-import { green, teal, lightGreen } from "@mui/material/colors";
+import { teal, lightGreen } from "@mui/material/colors";
 import { ThemeProvider } from "@mui/system";
 
 import "./App.css";

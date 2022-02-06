@@ -81,6 +81,12 @@ io.on("connection", (socket) => {
       socket.emit(`server erorr: ${e}`);
     }
   });
+
+  // cancel call
+  socket.on("callRefected", (message) => {
+    const callUserMessage = validateCallUserMessage(message);
+    socket.to(callUserMessage.caller.id).emit("callRejected", callUserMessage);
+  });
 });
 
 server.listen(PORT, () => console.log(`✨ Listening on port ${PORT} ✨`));

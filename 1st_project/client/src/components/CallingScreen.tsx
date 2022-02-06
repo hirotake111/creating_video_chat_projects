@@ -2,6 +2,8 @@ import { Box, Typography } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 import Fab from "@mui/material/Fab";
 import CallIcon from "@mui/icons-material/Call";
+import CancelIcon from "@mui/icons-material/Cancel";
+import { pink } from "@mui/material/colors";
 
 import { useSocketContext } from "./SocketContext";
 
@@ -12,7 +14,7 @@ export default function CallingScreen() {
     return null;
   }
 
-  const { callStatus, answerCall } = context;
+  const { callStatus, answerCall, cancelCall } = context;
   const statusTypes = ["beforeCalling", "calling", "receivingCall"];
 
   // const handleClick = () => {
@@ -63,13 +65,28 @@ export default function CallingScreen() {
               <Typography variant="h5" color="#fff">
                 Call from {callStatus.caller.name}
               </Typography>
-              <Fab
-                color="primary"
-                sx={{ marginTop: "16px" }}
-                aria-label="answer call"
-              >
-                <CallIcon onClick={() => answerCall(callStatus.caller)} />
-              </Fab>
+              <Box sx={{ marginTop: "32px" }}>
+                <Fab
+                  color="primary"
+                  sx={{ marginRight: "64px" }}
+                  aria-label="answer call"
+                >
+                  <CallIcon onClick={() => answerCall(callStatus.caller)} />
+                </Fab>
+                <Fab
+                  aria-label="answer call"
+                  sx={{ backgroundColor: pink[400] }}
+                >
+                  <CancelIcon
+                    onClick={() =>
+                      cancelCall({
+                        caller: callStatus.caller,
+                        callee: callStatus.callee,
+                      })
+                    }
+                  />
+                </Fab>
+              </Box>
             </>
           )}
           :

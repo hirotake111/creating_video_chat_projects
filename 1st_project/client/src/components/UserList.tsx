@@ -3,6 +3,8 @@ import List from "@mui/material/List";
 import { ListItemButton, Typography } from "@mui/material";
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import Divider from "@mui/material/Divider";
+import CircularProgress from "@mui/material/CircularProgress";
+
 import { useSocketContext } from "./SocketContext";
 
 export default function UserList() {
@@ -10,6 +12,7 @@ export default function UserList() {
   if (!context) return null;
   const { roster, id, callUser, callStatus } = context;
   const userIds = Object.keys(roster || {});
+  console.log({ userIds });
   return (
     <>
       <Box
@@ -46,6 +49,17 @@ export default function UserList() {
                     <Divider />
                   </div>
                 ))}
+              {userIds.length <= 1 && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <CircularProgress />
+                </Box>
+              )}
             </Box>
           </List>
         ) : (

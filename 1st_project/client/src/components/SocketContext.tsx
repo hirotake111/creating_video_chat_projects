@@ -18,7 +18,13 @@ import {
   validateAnswerMessage,
   validateCallUserMessage,
 } from "../utils/validator";
-import { CallStatus, Candidate, Config, Roster } from "../utils/types";
+import {
+  CallStatus,
+  CallUserMessage,
+  Candidate,
+  Config,
+  Roster,
+} from "../utils/types";
 import { useLocalStorage, useMediaStream } from "../utils/hooks";
 
 interface ContextValues {
@@ -29,7 +35,7 @@ interface ContextValues {
   roster: Roster;
   myVideo: RefObject<HTMLVideoElement>;
   peerVideo: RefObject<HTMLVideoElement>;
-  connectionRef: RefObject<Peer.Instance>;
+  // connectionRef: RefObject<Peer.Instance>;
   callUser: (callee: { id: string; name: string }) => Promise<void>;
   answerCall: (caller: {
     id: string;
@@ -37,6 +43,7 @@ interface ContextValues {
     signal: SignalData;
   }) => Promise<void>;
   leaveCall: () => void;
+  cancelCall: (callUserMessage: CallUserMessage) => void;
   config: Config;
   callStatus: CallStatus;
   setCallStatus: (newStatus: CallStatus) => void;
@@ -65,15 +72,11 @@ const ContextProvider = ({ children }: Props) => {
     switchAudio,
     switchVideo,
   } = useMediaStream();
-  // const [config, setConfig] = useState<Config>({
-  //   video: false,
-  //   audio: false,
-  // });
   const [id, setId] = useState<string>("");
   const { value: name, update: setName } = useLocalStorage<string>("name", "");
   const [roster, setRoster] = useState<Roster>({});
   const peerVideo = useRef<HTMLVideoElement>(null);
-  const connectionRef = useRef<Peer.Instance | null>(null);
+  // const connectionRef = useRef<Peer.Instance | null>(null);
   const [callStatus, setCallStatus] = useState<CallStatus>({
     type: "notSignedIn",
   });
@@ -100,6 +103,16 @@ const ContextProvider = ({ children }: Props) => {
         console.log("set new ID:", newId);
         setId(newId);
       }
+    });
+
+    // leave call if something happened
+    socket.on("callended", (data) => {
+      console.log("callended event:", { data });
+      leaveCall();
+    });
+
+    socket.on("callRejected", (message) => {
+      console.log("canceled", { message });
     });
 
     // calluser event handler
@@ -147,7 +160,6 @@ const ContextProvider = ({ children }: Props) => {
       console.log("sending answer;", { answer });
       socket.emit("answerCall", answer);
       // change state
-      // setCallAccepted(true);
       console.log("oncall");
       setCallStatus({ type: "onCall", ...answer });
     });
@@ -169,7 +181,7 @@ const ContextProvider = ({ children }: Props) => {
 
     // send a signal
     console.log("sending signal", { signal: caller.signal });
-    connectionRef.current = peer;
+    // connectionRef.current = peer;
     peer.signal(caller.signal);
     // preserve peer connection
   };
@@ -232,15 +244,22 @@ const ContextProvider = ({ children }: Props) => {
       peer.signal(callee.signal);
       console.log("signal sent");
       // preserve peer connection
-      connectionRef.current = peer;
+      // connectionRef.current = peer;
     });
   };
 
   const leaveCall = () => {
     // delete current connection
-    connectionRef.current?.destroy();
+    // connectionRef.current?.destroy();
+    setCallStatus({ type: "available" });
+    console.log("call ended");
     // reload window
-    window.location.reload();
+    // window.location.reload();
+  };
+
+  const cancelCall = (callUserMessage: CallUserMessage) => {
+    setCallStatus({ type: "available" });
+    socket.emit("callRejected", callUserMessage);
   };
 
   return (
@@ -253,10 +272,11 @@ const ContextProvider = ({ children }: Props) => {
         roster,
         myVideo,
         peerVideo,
-        connectionRef,
+        // connectionRef,
         callUser,
         answerCall,
         leaveCall,
+        cancelCall,
         switchAudio,
         switchVideo,
         config,

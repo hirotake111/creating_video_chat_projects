@@ -42,6 +42,7 @@ export const useMediaStream = () => {
       );
       console.log({ mediaStream });
       setStream(mediaStream);
+      console.log({ stream });
       // display audio and video
       setConfig({ video: true, audio: true });
       if (ref.current) {
@@ -88,5 +89,26 @@ export const useMediaStream = () => {
     });
   };
 
-  return { stream, ref, config, getStream, switchAudio, switchVideo };
+  /**
+   * disable all media
+   */
+  const disableMedia = (mediaStream: MediaStream) => {
+    mediaStream?.getTracks().forEach((track) => {
+      console.log({ track });
+      track.stop();
+    });
+    setStream(undefined);
+    setConfig({ audio: false, video: false });
+    console.log("all media streams are now disabled");
+  };
+
+  return {
+    stream,
+    ref,
+    config,
+    getStream,
+    switchAudio,
+    switchVideo,
+    disableMedia,
+  };
 };

@@ -12,7 +12,7 @@ export default function UserList() {
   if (!context) return null;
   const { roster, id, callUser, callStatus } = context;
   const userIds = Object.keys(roster || {});
-  console.log({ userIds });
+
   return (
     <>
       <Box

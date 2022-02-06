@@ -83,9 +83,8 @@ io.on("connection", (socket) => {
   });
 
   // cancel call
-  socket.on("callRefected", (message) => {
-    const callUserMessage = validateCallUserMessage(message);
-    socket.to(callUserMessage.caller.id).emit("callRejected", callUserMessage);
+  socket.on("callRejected", (id) => {
+    if (typeof id === "string") socket.to(id).emit("callRejected");
   });
 });
 

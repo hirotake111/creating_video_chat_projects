@@ -17,11 +17,6 @@ export default function CallingScreen() {
   const { callStatus, answerCall, cancelCall } = context;
   const statusTypes = ["beforeCalling", "calling", "receivingCall"];
 
-  // const handleClick = () => {
-  //   console.log("answer call");
-  //   answerCall();
-  // };
-
   return (
     <Box
       aria-label="calling"
@@ -78,12 +73,7 @@ export default function CallingScreen() {
                   sx={{ backgroundColor: pink[400] }}
                 >
                   <CancelIcon
-                    onClick={() =>
-                      cancelCall({
-                        caller: callStatus.caller,
-                        callee: callStatus.callee,
-                      })
-                    }
+                    onClick={() => cancelCall(callStatus.caller.id)}
                   />
                 </Fab>
               </Box>

@@ -18,13 +18,7 @@ import {
   validateAnswerMessage,
   validateCallUserMessage,
 } from "../utils/validator";
-import {
-  CallStatus,
-  CallUserMessage,
-  Candidate,
-  Config,
-  Roster,
-} from "../utils/types";
+import { CallStatus, Candidate, Config, Roster } from "../utils/types";
 import { useLocalStorage, useMediaStream } from "../utils/hooks";
 
 interface ContextValues {
@@ -43,7 +37,7 @@ interface ContextValues {
     signal: SignalData;
   }) => Promise<void>;
   leaveCall: () => void;
-  cancelCall: (callUserMessage: CallUserMessage) => void;
+  cancelCall: (callerId: string) => void;
   config: Config;
   callStatus: CallStatus;
   setCallStatus: (newStatus: CallStatus) => void;
@@ -71,6 +65,7 @@ const ContextProvider = ({ children }: Props) => {
     getStream,
     switchAudio,
     switchVideo,
+    disableMedia,
   } = useMediaStream();
   const [id, setId] = useState<string>("");
   const { value: name, update: setName } = useLocalStorage<string>("name", "");
@@ -109,10 +104,6 @@ const ContextProvider = ({ children }: Props) => {
     socket.on("callended", (data) => {
       console.log("callended event:", { data });
       leaveCall();
-    });
-
-    socket.on("callRejected", (message) => {
-      console.log("canceled", { message });
     });
 
     // calluser event handler
@@ -201,6 +192,7 @@ const ContextProvider = ({ children }: Props) => {
     } catch (e) {
       throw e;
     }
+    console.log("calluser():", { stream });
     /**
      * create a new peer
      * this will initiate comminucation between ICE server
@@ -222,6 +214,12 @@ const ContextProvider = ({ children }: Props) => {
       });
       socket.emit("callUser", callUserMessage);
       setCallStatus({ type: "calling", ...callUserMessage });
+      // if call is refected, disable all media tracks
+      socket.on("callRejected", () => {
+        console.log("callRejected");
+        disableMedia(mediaStream);
+        setCallStatus({ type: "available" });
+      });
     });
 
     // once user receives media stream, then do the followings
@@ -257,9 +255,12 @@ const ContextProvider = ({ children }: Props) => {
     // window.location.reload();
   };
 
-  const cancelCall = (callUserMessage: CallUserMessage) => {
+  /**
+   * cancel incoming call
+   */
+  const cancelCall = (callerId: string) => {
     setCallStatus({ type: "available" });
-    socket.emit("callRejected", callUserMessage);
+    socket.emit("callRejected", callerId);
   };
 
   return (

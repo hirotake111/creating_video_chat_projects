@@ -25,19 +25,18 @@ import {
 import { useLocalStorage } from "../utils/hooks";
 
 interface ContextValues {
-  stream: MediaStream | null;
+  stream: MediaStream | undefined;
   call: Call | null;
   name: string;
   setName: (name: string) => void;
   id: string;
   roster: Roster;
-  callAccepted: boolean;
   callEnded: boolean;
   myVideo: RefObject<HTMLVideoElement>;
   peerVideo: RefObject<HTMLVideoElement>;
   connectionRef: RefObject<Peer.Instance>;
   callUser: (callee: { id: string; name: string }) => Promise<void>;
-  answerCall: () => void;
+  answerCall: (caller: { id: string; name: string }) => Promise<void>;
   leaveCall: () => void;
   switchMediaDevice: (on: boolean) => void;
   config: Config;
@@ -67,16 +66,15 @@ interface Props {
 }
 
 const ContextProvider = ({ children }: Props) => {
-  const [stream, setStream] = useState<MediaStream | null>(null);
+  const [stream, setStream] = useState<MediaStream | undefined>(undefined);
   const [call, setCall] = useState<Call | null>(null);
   const [calling, setCalling] = useState<boolean>(false);
-  const { value: config, update: setConfig } = useLocalStorage<Config>(
-    "config",
-    { myVideoOn: false, peerVideoOn: false }
-  );
+  const [config, setConfig] = useState<Config>({
+    myVideoOn: false,
+    peerVideoOn: false,
+  });
   const [id, setId] = useState<string>("");
   const { value: name, update: setName } = useLocalStorage<string>("name", "");
-  const [callAccepted, setCallAccepted] = useState<boolean>(false);
   const [callEnded, setCallEnded] = useState<boolean>(true);
   const [roster, setRoster] = useState<Roster>({});
   const myVideo = useRef<HTMLVideoElement>(null);
@@ -96,6 +94,16 @@ const ContextProvider = ({ children }: Props) => {
   useEffect(() => {
     // debug
     console.log("registering event listener");
+
+    // // get and set media stream
+    // navigator.mediaDevices
+    //   .getUserMedia(constraints)
+    //   .then((mediaStream) => {
+    //     setStream(mediaStream);
+    //   })
+    //   .catch((reason) => {
+    //     console.error("failed to get media stream. reason:", reason);
+    //   });
 
     socket.on("rosterUpdate", (roster: Roster) => {
       console.log("roster updated:", { roster });
@@ -133,27 +141,35 @@ const ContextProvider = ({ children }: Props) => {
   /**
    * answer incoming call
    */
-  const answerCall = () => {
-    // change state
-    setCallAccepted(true);
-    // check to see if user have media stream and call
-    if (!stream) {
-      throw new Error(
-        "Media stream is null. Probably you did not get media stream at useEffect?"
-      );
-    }
-    if (!call) {
-      throw new Error("Call is an empty object.");
+  const answerCall = async (caller: { id: string; name: string }) => {
+    // if (!call) {
+    //   throw new Error("Call is an empty object.");
+    // }
+
+    // get media stream
+    let mediaStream: MediaStream | undefined;
+    try {
+      mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+      setStream(mediaStream);
+    } catch (e) {
+      console.error("Failed to get media stream. Reason:", e);
     }
 
     /**
      * create a new peer
      */
-    const peer = new Peer({ initiator: false, trickle: false, stream });
+    const peer = new Peer({
+      initiator: false,
+      trickle: false,
+      stream: mediaStream,
+    });
     // once user receives a signal, then do the followings
     peer.on("signal", (signal) => {
       console.log("peer.on(signal) received");
-      socket.emit("answerCall", { signal, caller: call.caller });
+      socket.emit("answerCall", { signal, caller });
+      // change state
+      // setCallAccepted(true);
+      setCallStatus({ type: "onCall" });
     });
     // once user receives media stream, then do the followings
     peer.on("stream", (mediaStream) => {
@@ -166,7 +182,8 @@ const ContextProvider = ({ children }: Props) => {
       peerVideo.current.srcObject = mediaStream;
     });
     // send a signal
-    peer.signal(call.signal);
+    console.log("sending signal");
+    // peer.signal(call.signal);
     // preserve peer connection
     connectionRef.current = peer;
   };
@@ -247,15 +264,20 @@ const ContextProvider = ({ children }: Props) => {
         if (myVideo.current) {
           // display video
           myVideo.current.srcObject = mediaStream;
+          // setConfig({ ...config, myVideoOn: true });
         }
       });
     } else {
       // turn off
-      if (myVideo.current) myVideo.current.srcObject = null;
+      if (myVideo.current) {
+        myVideo.current.srcObject = null;
+        // setConfig({ ...config, myVideoOn: false });
+      }
+      // stop video
       stream?.getVideoTracks().forEach((track) => {
-        // console.log("track:", track);
         track.stop();
       });
+      setStream(undefined);
     }
   };
 
@@ -269,7 +291,6 @@ const ContextProvider = ({ children }: Props) => {
         roster,
         call,
         calling,
-        callAccepted,
         callEnded,
         myVideo,
         peerVideo,

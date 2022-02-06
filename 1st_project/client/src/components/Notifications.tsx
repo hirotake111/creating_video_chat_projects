@@ -4,11 +4,11 @@ import { useSocketContext } from "./SocketContext";
 export default function Notifications() {
   const context = useSocketContext();
   if (!context) return null;
-  const { call, callAccepted } = context;
+  const { call } = context;
 
   return (
     <Box>
-      {call?.isReceivedCall && !callAccepted && (
+      {call?.isReceivedCall && (
         <Typography>Incoming call from {call.caller.name}</Typography>
       )}
     </Box>

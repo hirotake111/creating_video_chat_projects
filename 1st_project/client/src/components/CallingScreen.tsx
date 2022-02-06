@@ -1,5 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
+import Fab from "@mui/material/Fab";
+import CallIcon from "@mui/icons-material/Call";
 
 import { useSocketContext } from "./SocketContext";
 
@@ -10,10 +12,13 @@ export default function CallingScreen() {
     return null;
   }
 
-  const { callStatus } = context;
-  console.log({ callStatus });
-
+  const { callStatus, answerCall } = context;
   const statusTypes = ["beforeCalling", "calling", "receivingCall"];
+
+  // const handleClick = () => {
+  //   console.log("answer call");
+  //   answerCall();
+  // };
 
   return (
     <Box
@@ -54,9 +59,18 @@ export default function CallingScreen() {
               Calling {callStatus.callee.name}...
             </Typography>
           ) : (
-            <Typography variant="h5" color="#fff">
-              Call from {callStatus.caller.name}
-            </Typography>
+            <>
+              <Typography variant="h5" color="#fff">
+                Call from {callStatus.caller.name}
+              </Typography>
+              <Fab
+                color="primary"
+                sx={{ marginTop: "16px" }}
+                aria-label="answer call"
+              >
+                <CallIcon onClick={() => answerCall(callStatus.caller)} />
+              </Fab>
+            </>
           )}
           :
         </Box>

@@ -11,7 +11,7 @@ import {
   useState,
 } from "react";
 import { io } from "socket.io-client";
-import Peer from "simple-peer";
+import Peer, { SignalData } from "simple-peer";
 
 import { config } from "../config";
 import { validateCallUserMessage } from "../utils/validator";
@@ -36,10 +36,13 @@ interface ContextValues {
   peerVideo: RefObject<HTMLVideoElement>;
   connectionRef: RefObject<Peer.Instance>;
   callUser: (callee: { id: string; name: string }) => Promise<void>;
-  answerCall: (caller: { id: string; name: string }) => Promise<void>;
+  answerCall: (caller: {
+    id: string;
+    name: string;
+    signal: SignalData;
+  }) => Promise<void>;
   leaveCall: () => void;
   config: Config;
-  setConfig: (config: Config) => void;
   calling: boolean;
   callStatus: CallStatus;
   setCallStatus: (newStatus: CallStatus) => void;
@@ -71,16 +74,17 @@ const ContextProvider = ({ children }: Props) => {
   const {
     stream,
     ref: myVideo,
+    config,
     getStream,
     switchAudio,
     switchVideo,
   } = useMediaStream();
   const [call, setCall] = useState<Call | null>(null);
   const [calling, setCalling] = useState<boolean>(false);
-  const [config, setConfig] = useState<Config>({
-    myVideoOn: false,
-    peerVideoOn: false,
-  });
+  // const [config, setConfig] = useState<Config>({
+  //   video: false,
+  //   audio: false,
+  // });
   const [id, setId] = useState<string>("");
   const { value: name, update: setName } = useLocalStorage<string>("name", "");
   const [callEnded, setCallEnded] = useState<boolean>(true);
@@ -135,9 +139,9 @@ const ContextProvider = ({ children }: Props) => {
       // set call
       setCall({ isReceivedCall: true, caller, callee, signal });
       // update call status
-      setCallStatus({ type: "receivingCall", caller });
+      setCallStatus({ type: "receivingCall", caller: { ...caller, signal } });
     });
-  }, [config, setConfig]);
+  }, [config]);
 
   useEffect(() => {
     // When reconnected, send username again
@@ -149,35 +153,37 @@ const ContextProvider = ({ children }: Props) => {
   /**
    * answer incoming call
    */
-  const answerCall = async (caller: { id: string; name: string }) => {
+  const answerCall = async (caller: {
+    id: string;
+    name: string;
+    signal: SignalData;
+  }) => {
+    console.log("answerCall()", { caller });
     // if (!call) {
     //   throw new Error("Call is an empty object.");
     // }
 
-    // get media stream
-    let mediaStream: MediaStream | undefined;
     try {
+      // get media stream
       await getStream();
     } catch (e) {
-      console.error("Failed to get media stream. Reason:", e);
+      throw e;
     }
-
+    console.log("got media stream", { stream });
     /**
      * create a new peer
      */
-    const peer = new Peer({
-      initiator: false,
-      trickle: false,
-      stream: mediaStream,
-    });
+    const peer = new Peer({ initiator: false, trickle: false, stream });
     // once user receives a signal, then do the followings
     peer.on("signal", (signal) => {
       console.log("peer.on(signal) received");
       socket.emit("answerCall", { signal, caller });
       // change state
       // setCallAccepted(true);
+      console.log("oncall");
       setCallStatus({ type: "onCall" });
     });
+
     // once user receives media stream, then do the followings
     peer.on("stream", (mediaStream) => {
       console.log("peer on stream received");
@@ -188,9 +194,10 @@ const ContextProvider = ({ children }: Props) => {
       // set media stream
       peerVideo.current.srcObject = mediaStream;
     });
+
     // send a signal
     console.log("sending signal");
-    // peer.signal(call.signal);
+    peer.signal(caller.signal);
     // preserve peer connection
     connectionRef.current = peer;
   };
@@ -203,7 +210,12 @@ const ContextProvider = ({ children }: Props) => {
     // update calling status
     // setCalling(true);
     setCallStatus({ type: "beforeCalling" });
-
+    try {
+      // get media stream
+      await getStream();
+    } catch (e) {
+      throw e;
+    }
     /**
      * create a new peer
      * this will initiate comminucation between ICE server
@@ -281,7 +293,6 @@ const ContextProvider = ({ children }: Props) => {
         switchAudio,
         switchVideo,
         config,
-        setConfig,
         callStatus,
         setCallStatus,
       }}

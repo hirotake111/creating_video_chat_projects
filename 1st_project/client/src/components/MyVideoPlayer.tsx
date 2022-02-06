@@ -20,7 +20,7 @@ export default function MyVideoPlayer() {
           borderRadius: mobile ? "24px" : "10px",
           overflow: "hidden",
           backgroundColor: "#222",
-          display: context?.config.myVideoOn ? "block" : "none",
+          display: context?.config.video ? "block" : "none",
         }}
       >
         <video

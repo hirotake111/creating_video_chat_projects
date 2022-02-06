@@ -20,8 +20,8 @@ export interface Call {
 }
 
 export interface Config {
-  myVideoOn: boolean;
-  peerVideoOn: boolean;
+  video: boolean;
+  audio: boolean;
 }
 
 export interface Roster {
@@ -33,5 +33,8 @@ export type CallStatus =
   | { type: "available" }
   | { type: "beforeCalling" }
   | { type: "calling"; callee: { id: string; name: string } }
-  | { type: "receivingCall"; caller: { id: string; name: string } }
+  | {
+      type: "receivingCall";
+      caller: { id: string; name: string; signal: SignalData };
+    }
   | { type: "onCall" };

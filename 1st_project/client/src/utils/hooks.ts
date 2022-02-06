@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { Config } from "./types";
 
 export const useLocalStorage = <T>(key: string, initialVale: T) => {
   const storedData = localStorage.getItem(key);
@@ -24,17 +25,25 @@ const constraints: MediaStreamConstraints = {
 
 export const useMediaStream = () => {
   const [stream, setStream] = useState<MediaStream | undefined>(undefined);
+  const [config, setConfig] = useState<Config>({
+    video: false,
+    audio: false,
+  });
   const ref = useRef<HTMLVideoElement>(null);
 
   /**
    * get media stream and set to ref
    */
   const getStream = async () => {
+    console.log("getStream()");
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia(
         constraints
       );
+      console.log({ mediaStream });
       setStream(mediaStream);
+      // display audio and video
+      setConfig({ video: true, audio: true });
       if (ref.current) {
         // display video
         ref.current.srcObject = mediaStream;
@@ -45,6 +54,7 @@ export const useMediaStream = () => {
   };
 
   const switchAudio = async (enabled: boolean) => {
+    // if mediaStream has not got fetched, then get it
     if (enabled && !stream) {
       try {
         await getStream();
@@ -53,11 +63,15 @@ export const useMediaStream = () => {
       }
     }
     stream?.getAudioTracks().forEach((track) => {
+      // enable/disable media
       track.enabled = enabled;
+      // also update config
+      setConfig({ ...config, audio: enabled });
     });
   };
 
   const switchVideo = async (enabled: boolean) => {
+    // if mediaStream has not got fetched, then get it
     if (enabled && !stream) {
       try {
         await getStream();
@@ -66,9 +80,12 @@ export const useMediaStream = () => {
       }
     }
     stream?.getVideoTracks().forEach((track) => {
+      // enable/disable media
       track.enabled = enabled;
+      // also update config
+      setConfig({ ...config, video: enabled });
     });
   };
 
-  return { stream, ref, getStream, switchAudio, switchVideo };
+  return { stream, ref, config, getStream, switchAudio, switchVideo };
 };

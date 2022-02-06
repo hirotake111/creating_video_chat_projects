@@ -34,7 +34,7 @@ export const useMediaStream = () => {
   /**
    * get media stream and set to ref
    */
-  const getStream = async () => {
+  const getStream = async (): Promise<MediaStream> => {
     console.log("getStream()");
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia(
@@ -48,6 +48,7 @@ export const useMediaStream = () => {
         // display video
         ref.current.srcObject = mediaStream;
       }
+      return mediaStream;
     } catch (e) {
       throw e;
     }

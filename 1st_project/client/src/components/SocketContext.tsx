@@ -18,25 +18,15 @@ import {
   validateAnswerMessage,
   validateCallUserMessage,
 } from "../utils/validator";
-import {
-  AnswerMessage,
-  Call,
-  CallStatus,
-  CallUserMessage,
-  Candidate,
-  Config,
-  Roster,
-} from "../utils/types";
+import { CallStatus, Candidate, Config, Roster } from "../utils/types";
 import { useLocalStorage, useMediaStream } from "../utils/hooks";
 
 interface ContextValues {
   stream: MediaStream | undefined;
-  call: Call | null;
   name: string;
   setName: (name: string) => void;
   id: string;
   roster: Roster;
-  callEnded: boolean;
   myVideo: RefObject<HTMLVideoElement>;
   peerVideo: RefObject<HTMLVideoElement>;
   connectionRef: RefObject<Peer.Instance>;
@@ -48,7 +38,6 @@ interface ContextValues {
   }) => Promise<void>;
   leaveCall: () => void;
   config: Config;
-  calling: boolean;
   callStatus: CallStatus;
   setCallStatus: (newStatus: CallStatus) => void;
   switchAudio: (enabled: boolean) => Promise<void>;
@@ -61,14 +50,6 @@ const socket = io(config.serverUrl, { autoConnect: true });
 socket.onAny((event) => {
   console.log("onAny:", { event });
 });
-
-const constraints: MediaStreamConstraints = {
-  audio: true,
-  video: {
-    width: 1024, //1280,
-    height: 576, //720,
-  },
-};
 
 interface Props {
   children: ReactNode;
@@ -84,17 +65,13 @@ const ContextProvider = ({ children }: Props) => {
     switchAudio,
     switchVideo,
   } = useMediaStream();
-  const [call, setCall] = useState<Call | null>(null);
-  const [calling, setCalling] = useState<boolean>(false);
   // const [config, setConfig] = useState<Config>({
   //   video: false,
   //   audio: false,
   // });
   const [id, setId] = useState<string>("");
   const { value: name, update: setName } = useLocalStorage<string>("name", "");
-  const [callEnded, setCallEnded] = useState<boolean>(true);
   const [roster, setRoster] = useState<Roster>({});
-  // const myVideo = useRef<HTMLVideoElement>(null);
   const peerVideo = useRef<HTMLVideoElement>(null);
   const connectionRef = useRef<Peer.Instance | null>(null);
   const [callStatus, setCallStatus] = useState<CallStatus>({
@@ -130,8 +107,6 @@ const ContextProvider = ({ children }: Props) => {
       console.log("socket.on(callUser):", { payload });
       // validate name
       const { caller, callee } = validateCallUserMessage(payload);
-      // set call
-      setCall({ isReceivedCall: true, caller, callee });
       // update call status
       setCallStatus({ type: "receivingCall", caller, callee });
     });
@@ -151,7 +126,7 @@ const ContextProvider = ({ children }: Props) => {
     let mediaStream: MediaStream;
     try {
       // get media stream
-      mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+      mediaStream = await getStream();
     } catch (e) {
       throw e;
     }
@@ -210,7 +185,7 @@ const ContextProvider = ({ children }: Props) => {
     let mediaStream: MediaStream;
     try {
       // get media stream
-      mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+      mediaStream = await getStream();
     } catch (e) {
       throw e;
     }
@@ -262,7 +237,6 @@ const ContextProvider = ({ children }: Props) => {
   };
 
   const leaveCall = () => {
-    setCallEnded(true);
     // delete current connection
     connectionRef.current?.destroy();
     // reload window
@@ -277,9 +251,6 @@ const ContextProvider = ({ children }: Props) => {
         name,
         setName,
         roster,
-        call,
-        calling,
-        callEnded,
         myVideo,
         peerVideo,
         connectionRef,

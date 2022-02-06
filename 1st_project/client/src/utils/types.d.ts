@@ -21,12 +21,6 @@ export interface AnswerMessage {
   callee: Candidate;
 }
 
-export interface Call {
-  isReceivedCall: boolean;
-  caller: Candidate;
-  callee: { id: string; name: string };
-}
-
 export interface Config {
   video: boolean;
   audio: boolean;

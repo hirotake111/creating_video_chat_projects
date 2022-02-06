@@ -1,4 +1,4 @@
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import List from "@mui/material/List";
 import { ListItemButton, Typography } from "@mui/material";
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
@@ -8,7 +8,7 @@ import { useSocketContext } from "./SocketContext";
 export default function UserList() {
   const context = useSocketContext();
   if (!context) return null;
-  const { roster, id, name, callUser, callStatus } = context;
+  const { roster, id, callUser, callStatus } = context;
   const userIds = Object.keys(roster || {});
   return (
     <>

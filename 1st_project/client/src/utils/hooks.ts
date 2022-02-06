@@ -17,10 +17,11 @@ export const useLocalStorage = <T>(key: string, initialVale: T) => {
 
 const constraints: MediaStreamConstraints = {
   audio: true,
-  video: {
-    width: 1024, //1280,
-    height: 576, //720,
-  },
+  video: true,
+  // video: {
+  //   width: 1024, //1280,
+  //   height: 576, //720,
+  // },
 };
 
 export const useMediaStream = () => {
@@ -95,9 +96,9 @@ export const useMediaStream = () => {
   const disableMedia = (mediaStream: MediaStream) => {
     mediaStream?.getTracks().forEach((track) => {
       console.log({ track });
-      track.stop();
+      track.enabled = false;
     });
-    setStream(undefined);
+    // setStream(undefined);
     setConfig({ audio: false, video: false });
     console.log("all media streams are now disabled");
   };

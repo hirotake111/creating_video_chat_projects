@@ -14,11 +14,16 @@ import { io } from "socket.io-client";
 import Peer, { SignalData } from "simple-peer";
 
 import { config } from "../config";
-import { validateCallUserMessage } from "../utils/validator";
 import {
+  validateAnswerMessage,
+  validateCallUserMessage,
+} from "../utils/validator";
+import {
+  AnswerMessage,
   Call,
   CallStatus,
   CallUserMessage,
+  Candidate,
   Config,
   Roster,
 } from "../utils/types";
@@ -106,17 +111,6 @@ const ContextProvider = ({ children }: Props) => {
   useEffect(() => {
     // debug
     console.log("registering event listener");
-
-    // // get and set media stream
-    // navigator.mediaDevices
-    //   .getUserMedia(constraints)
-    //   .then((mediaStream) => {
-    //     setStream(mediaStream);
-    //   })
-    //   .catch((reason) => {
-    //     console.error("failed to get media stream. reason:", reason);
-    //   });
-
     socket.on("rosterUpdate", (roster: Roster) => {
       console.log("roster updated:", { roster });
       setRoster(roster);
@@ -135,11 +129,11 @@ const ContextProvider = ({ children }: Props) => {
     socket.on("callUser", (payload) => {
       console.log("socket.on(callUser):", { payload });
       // validate name
-      const { caller, callee, signal } = validateCallUserMessage(payload);
+      const { caller, callee } = validateCallUserMessage(payload);
       // set call
-      setCall({ isReceivedCall: true, caller, callee, signal });
+      setCall({ isReceivedCall: true, caller, callee });
       // update call status
-      setCallStatus({ type: "receivingCall", caller: { ...caller, signal } });
+      setCallStatus({ type: "receivingCall", caller, callee });
     });
   }, [config]);
 
@@ -153,35 +147,34 @@ const ContextProvider = ({ children }: Props) => {
   /**
    * answer incoming call
    */
-  const answerCall = async (caller: {
-    id: string;
-    name: string;
-    signal: SignalData;
-  }) => {
-    console.log("answerCall()", { caller });
-    // if (!call) {
-    //   throw new Error("Call is an empty object.");
-    // }
-
+  const answerCall = async (caller: Candidate) => {
+    let mediaStream: MediaStream;
     try {
       // get media stream
-      await getStream();
+      mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
     } catch (e) {
       throw e;
     }
-    console.log("got media stream", { stream });
-    /**
-     * create a new peer
-     */
-    const peer = new Peer({ initiator: false, trickle: false, stream });
+    console.log("got media stream", { mediaStream });
+    // create a new peer
+    const peer = new Peer({
+      initiator: false,
+      trickle: false,
+      stream: mediaStream,
+    });
     // once user receives a signal, then do the followings
     peer.on("signal", (signal) => {
-      console.log("peer.on(signal) received");
-      socket.emit("answerCall", { signal, caller });
+      console.log("peer.on(signal) received", { signal });
+      const answer = validateAnswerMessage({
+        caller,
+        callee: { id, name, signal },
+      });
+      console.log("sending answer;", { answer });
+      socket.emit("answerCall", answer);
       // change state
       // setCallAccepted(true);
       console.log("oncall");
-      setCallStatus({ type: "onCall" });
+      setCallStatus({ type: "onCall", ...answer });
     });
 
     // once user receives media stream, then do the followings
@@ -195,11 +188,15 @@ const ContextProvider = ({ children }: Props) => {
       peerVideo.current.srcObject = mediaStream;
     });
 
+    peer.on("connect", () => {
+      console.log("on connect:");
+    });
+
     // send a signal
-    console.log("sending signal");
+    console.log("sending signal", { signal: caller.signal });
+    connectionRef.current = peer;
     peer.signal(caller.signal);
     // preserve peer connection
-    connectionRef.current = peer;
   };
 
   /**
@@ -210,9 +207,10 @@ const ContextProvider = ({ children }: Props) => {
     // update calling status
     // setCalling(true);
     setCallStatus({ type: "beforeCalling" });
+    let mediaStream: MediaStream;
     try {
       // get media stream
-      await getStream();
+      mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
     } catch (e) {
       throw e;
     }
@@ -225,44 +223,42 @@ const ContextProvider = ({ children }: Props) => {
     const peer = new Peer({
       initiator: true,
       trickle: false,
-      stream: stream || undefined,
+      stream: mediaStream,
     });
     console.log("peer created");
     // // once user receives a signal, then do the followings
     peer.on("signal", (signal) => {
       // signal should be {type: "offer", sdp:"....."}
-      socket.emit(
-        "callUser",
-        validateCallUserMessage({
-          caller: { id, name },
-          callee,
-          signal,
-        } as CallUserMessage)
-      );
-      setCallStatus({ type: "calling", callee });
+      const callUserMessage = validateCallUserMessage({
+        caller: { id, name, signal },
+        callee,
+      });
+      socket.emit("callUser", callUserMessage);
+      setCallStatus({ type: "calling", ...callUserMessage });
     });
 
-    // // once user receives media stream, then do the followings
-    // peer.on("stream", (mediaStream) => {
-    //   console.log("peer on stream received");
+    // once user receives media stream, then do the followings
+    peer.on("stream", (peerStream) => {
+      console.log("peer on stream received");
 
-    //   // check to see if peerRef is attached to vide element
-    //   if (!peerVideo.current) {
-    //     throw new Error("peerVideo is not set");
-    //   }
-    //   // set media stream
-    //   peerVideo.current.srcObject = mediaStream;
-    // });
+      // check to see if peerRef is attached to vide element
+      if (!peerVideo.current) {
+        throw new Error("peerVideo is not set");
+      }
+      // set media stream
+      peerVideo.current.srcObject = peerStream;
+    });
 
-    // peer.on("callAccepted", (signal) => {
-    //   console.log("peer on callAccedpted received");
-
-    //   setCallAccepted(true);
-    //   // send a signal
-    //   peer.signal(signal);
-    //   // preserve peer connection
-    //   connectionRef.current = peer;
-    // });
+    socket.on("callAccepted", (data) => {
+      console.log("peer on callAccedpted received", { data });
+      const { caller, callee } = validateAnswerMessage(data);
+      setCallStatus({ type: "onCall", caller, callee });
+      // send a signal
+      peer.signal(callee.signal);
+      console.log("signal sent");
+      // preserve peer connection
+      connectionRef.current = peer;
+    });
   };
 
   const leaveCall = () => {

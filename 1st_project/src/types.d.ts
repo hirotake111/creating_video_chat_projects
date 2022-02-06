@@ -1,18 +1,20 @@
 import { SignalData } from "simple-peer";
 
+interface Candidate {
+  id: string;
+  name: string;
+  signal: SignalData;
+}
+
 export interface CallUserMessage {
-  caller: {
-    id: string;
-    name: string;
-  };
+  caller: Candidate;
   callee: {
     id: string;
     name: string;
   };
-  signal: SignalData;
 }
 
 export interface AnswerMessage {
-  caller: { id: string; name: string };
-  signal: any;
+  caller: Candidate;
+  callee: Candidate;
 }

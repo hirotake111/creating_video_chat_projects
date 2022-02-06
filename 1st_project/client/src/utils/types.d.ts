@@ -1,22 +1,30 @@
 import { SignalData } from "simple-peer";
 
+interface Candidate {
+  id: string;
+  name: string;
+  signal: SignalData;
+}
+
+interface;
+
 export interface CallUserMessage {
-  caller: {
-    id: string;
-    name: string;
-  };
+  caller: Candidate;
   callee: {
     id: string;
     name: string;
   };
-  signal: SignalData;
+}
+
+export interface AnswerMessage {
+  caller: Candidate;
+  callee: Candidate;
 }
 
 export interface Call {
   isReceivedCall: boolean;
-  caller: { id: string; name: string };
+  caller: Candidate;
   callee: { id: string; name: string };
-  signal: SignalData;
 }
 
 export interface Config {
@@ -32,9 +40,6 @@ export type CallStatus =
   | { type: "notSignedIn" }
   | { type: "available" }
   | { type: "beforeCalling" }
-  | { type: "calling"; callee: { id: string; name: string } }
-  | {
-      type: "receivingCall";
-      caller: { id: string; name: string; signal: SignalData };
-    }
-  | { type: "onCall" };
+  | ({ type: "calling" } & CallUserMessage)
+  | ({ type: "receivingCall" } & CallUserMessage)
+  | ({ type: "onCall" } & AnswerMessage);

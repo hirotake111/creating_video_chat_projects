@@ -1,20 +1,28 @@
-import { AnswerMessage, CallUserMessage } from "./types";
+import { AnswerMessage, CallUserMessage, Candidate } from "./types";
 
 const getError = (message: string) => {
   return new Error(`Validation error: ${message}`);
 };
 
-export const validateCallUserMessage = (data: any): CallUserMessage => {
+const validateCandidate = (data: any): Candidate => {
   if (!data) throw getError("data is undefined or null");
-  const { callee, caller, signal } = data as CallUserMessage;
+  const { id, name, signal } = data as Candidate;
   if (
     !(
-      caller &&
-      typeof caller.id === "string" &&
-      typeof caller.name === "string"
+      typeof id === "string" &&
+      typeof name === "string" &&
+      typeof signal === "object" &&
+      typeof signal.type === "string"
     )
   )
-    throw getError(`invalid 'caller' object: : ${JSON.stringify(caller)}`);
+    throw getError(`invalid 'candidate' object: ${JSON.stringify(data)}`);
+  return { id, name, signal };
+};
+
+export const validateCallUserMessage = (data: any): CallUserMessage => {
+  if (!data) throw getError("data is undefined or null");
+  const { callee, caller } = data as CallUserMessage;
+  validateCandidate(caller);
   if (
     !(
       callee &&
@@ -22,20 +30,14 @@ export const validateCallUserMessage = (data: any): CallUserMessage => {
       typeof callee.name === "string"
     )
   )
-    throw getError(`invalid 'callee' object: : ${JSON.stringify(callee)}}`);
-  if (!(signal && typeof signal.type === "string" && typeof signal))
-    throw getError(`invalid 'signal' object: ${JSON.stringify(signal)}`);
-
-  return { caller, callee, signal };
+    throw getError(`invalid 'callee' object: ${JSON.stringify(callee)}`);
+  return { caller, callee };
 };
 
-export const validateAnswerData = (data: any): AnswerMessage => {
+export const validateAnswerMessage = (data: any): AnswerMessage => {
   if (!data) throw getError("data is undefined or null");
-  const { caller, signal } = data as AnswerMessage;
-  if (!(caller && typeof caller.id === "string" && typeof caller.name))
-    throw getError(`invalid 'caller' object: ${JSON.stringify(caller)}`);
-  if (!(signal && typeof signal.type === "string"))
-    throw getError(`invalid 'signal' object: ${JSON.stringify(signal)}`);
-
-  return { caller, signal };
+  const { caller, callee } = data as AnswerMessage;
+  validateCandidate(caller);
+  validateCandidate(callee);
+  return { caller, callee };
 };

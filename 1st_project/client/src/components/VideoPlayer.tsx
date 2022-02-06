@@ -6,15 +6,17 @@ export default function VideoPlayer() {
 
   return (
     <>
-      <Grid sx={{ height: "100%", backgroundColor: "gray" }}>
+      <Grid
+        aria-label="peer video"
+        sx={{ width: "100%", height: "100%", backgroundColor: "blue" }}
+      >
         {context && (
           <video
-            aria-label="my video"
             playsInline
             muted
             autoPlay
             ref={context.peerVideo}
-            style={{ objectFit: "cover" }}
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
         )}
       </Grid>

@@ -2,7 +2,7 @@ import express from "express";
 import { createServer } from "http";
 import cors from "cors";
 import { Server } from "socket.io";
-import { validateAnswerData, validateCallUserMessage } from "./validators";
+import { validateAnswerMessage, validateCallUserMessage } from "./validators";
 
 const PORT = process.env.PORT || "3000";
 /**
@@ -59,12 +59,12 @@ io.on("connection", (socket) => {
   });
 
   // this will send 'callUser' message to callee
-  socket.on("callUser", (callUserData: any) => {
+  socket.on("callUser", (message: any) => {
     console.log("socket.on(callUser)");
     try {
-      const { caller, callee, signal } = validateCallUserMessage(callUserData);
-      console.log(JSON.stringify(callee));
-      socket.to(callee.id).emit("callUser", { caller, callee, signal });
+      const callUserMessage = validateCallUserMessage(message);
+      console.log(JSON.stringify(callUserMessage));
+      socket.to(callUserMessage.callee.id).emit("callUser", callUserMessage);
     } catch (e) {
       // send error message back to sender
       socket.emit(`server erorr: ${e}`);
@@ -72,10 +72,10 @@ io.on("connection", (socket) => {
   });
 
   // this gets kicked off when callee send answer
-  socket.on("answerCall", (answerData: any) => {
+  socket.on("answerCall", (message: any) => {
     try {
-      const { caller, signal } = validateAnswerData(answerData);
-      socket.to(caller.id).emit("callAccepted", signal);
+      const answer = validateAnswerMessage(message);
+      socket.to(answer.caller.id).emit("callAccepted", answer);
     } catch (e) {
       // send error message back to sender
       socket.emit(`server erorr: ${e}`);

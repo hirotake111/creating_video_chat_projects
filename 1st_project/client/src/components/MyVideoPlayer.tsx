@@ -10,14 +10,14 @@ export default function MyVideoPlayer() {
     <Box
       sx={{
         position: "absolute",
-        bottom: mobile ? "24px" : "64px",
-        left: mobile ? "24px" : "64px",
+        top: mobile ? "64px" : "96px",
+        right: mobile ? "24px" : "32px",
       }}
     >
       <Box
         sx={{
           border: "6px solid #fff",
-          borderRadius: mobile ? "24px" : "10px",
+          borderRadius: mobile ? "24px" : "16px",
           overflow: "hidden",
           backgroundColor: "#222",
           display: context?.config.video ? "block" : "none",

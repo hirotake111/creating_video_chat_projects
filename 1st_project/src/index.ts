@@ -86,6 +86,13 @@ io.on("connection", (socket) => {
   socket.on("callRejected", (id) => {
     if (typeof id === "string") socket.to(id).emit("callRejected");
   });
+
+  // peer leaves call
+  socket.on("callManuallyEnded", (peerId) => {
+    if (typeof peerId === "string") {
+      socket.to(peerId).emit("callManuallyEnded");
+    }
+  });
 });
 
 server.listen(PORT, () => console.log(`✨ Listening on port ${PORT} ✨`));

@@ -62,14 +62,14 @@ export default function CallingScreen() {
               </Typography>
               <Box sx={{ marginTop: "32px" }}>
                 <Fab
+                  aria-label="answer call"
                   color="primary"
                   sx={{ marginRight: "64px" }}
-                  aria-label="answer call"
                 >
                   <CallIcon onClick={() => answerCall(callStatus.caller)} />
                 </Fab>
                 <Fab
-                  aria-label="answer call"
+                  aria-label="cancel call"
                   sx={{ backgroundColor: pink[400] }}
                 >
                   <CancelIcon

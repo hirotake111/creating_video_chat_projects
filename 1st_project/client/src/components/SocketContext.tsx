@@ -36,13 +36,14 @@ interface ContextValues {
     name: string;
     signal: SignalData;
   }) => Promise<void>;
-  leaveCall: () => void;
+  leaveCall: (peerId: string) => void;
   cancelCall: (callerId: string) => void;
   config: Config;
   callStatus: CallStatus;
   setCallStatus: (newStatus: CallStatus) => void;
   switchAudio: (enabled: boolean) => Promise<void>;
   switchVideo: (enabled: boolean) => Promise<void>;
+  disableMedia: (mediaStream: MediaStream) => void;
 }
 
 const SocketContext = createContext<ContextValues | null>(null);
@@ -100,12 +101,6 @@ const ContextProvider = ({ children }: Props) => {
       }
     });
 
-    // leave call if something happened
-    socket.on("callended", (data) => {
-      console.log("callended event:", { data });
-      leaveCall();
-    });
-
     // calluser event handler
     socket.on("callUser", (payload) => {
       console.log("socket.on(callUser):", { payload });
@@ -149,10 +144,22 @@ const ContextProvider = ({ children }: Props) => {
         callee: { id, name, signal },
       });
       console.log("sending answer;", { answer });
+      // send answer message
       socket.emit("answerCall", answer);
       // change state
       console.log("oncall");
       setCallStatus({ type: "onCall", ...answer });
+      // if call closed manually perform below
+      socket.on("callManuallyEnded", () => {
+        disableMedia(mediaStream);
+        setCallStatus({ type: "available" });
+      });
+      // leave call if something happened
+      socket.on("callended", () => {
+        disableMedia(mediaStream);
+        leaveCall(caller.id);
+        setCallStatus({ type: "available" });
+      });
     });
 
     // once user receives media stream, then do the followings
@@ -220,6 +227,17 @@ const ContextProvider = ({ children }: Props) => {
         disableMedia(mediaStream);
         setCallStatus({ type: "available" });
       });
+      // if call closed manually perform below
+      socket.on("callManuallyEnded", () => {
+        disableMedia(mediaStream);
+        setCallStatus({ type: "available" });
+      });
+      // leave call if something happened
+      socket.on("callended", () => {
+        disableMedia(mediaStream);
+        leaveCall(callee.id);
+        setCallStatus({ type: "available" });
+      });
     });
 
     // once user receives media stream, then do the followings
@@ -246,13 +264,14 @@ const ContextProvider = ({ children }: Props) => {
     });
   };
 
-  const leaveCall = () => {
+  const leaveCall = (peerId: string) => {
     // delete current connection
     // connectionRef.current?.destroy();
     setCallStatus({ type: "available" });
-    console.log("call ended");
     // reload window
     // window.location.reload();
+    socket.emit("callManuallyEnded", peerId);
+    console.log("callended", { stream, peerId });
   };
 
   /**
@@ -283,6 +302,7 @@ const ContextProvider = ({ children }: Props) => {
         config,
         callStatus,
         setCallStatus,
+        disableMedia,
       }}
     >
       {children}

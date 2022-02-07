@@ -16,11 +16,14 @@ export default function CustomSpeedDial() {
     switchVideo,
     switchAudio,
     stream,
+    callStatus,
   } = context;
 
   return (
     <>
-      {stream && (
+      {!["notSignedIn", "available", "receivingCall"].includes(
+        callStatus.type
+      ) && (
         <SpeedDial
           ariaLabel="options"
           sx={{ position: "absolute", bottom: 64, right: 64 }}

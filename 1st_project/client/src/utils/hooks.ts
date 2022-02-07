@@ -96,7 +96,7 @@ export const useMediaStream = () => {
   const disableMedia = (mediaStream: MediaStream) => {
     mediaStream?.getTracks().forEach((track) => {
       console.log({ track });
-      track.enabled = false;
+      track.stop();
     });
     // setStream(undefined);
     setConfig({ audio: false, video: false });

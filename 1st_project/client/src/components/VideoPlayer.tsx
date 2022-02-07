@@ -21,7 +21,6 @@ export default function VideoPlayer() {
       >
         <video
           playsInline
-          muted
           autoPlay
           ref={peerVideo}
           style={{ width: "100%", height: "100%", objectFit: "cover" }}

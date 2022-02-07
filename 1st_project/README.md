@@ -10,11 +10,13 @@ docker build -t $IMAGE -f Dockerfile-dev .
 docker build -t $IMAGE .
 ```
 
-### Run server
+### Start development environment
 
 ```bash
-docker-compose up
-# -> ✨ Listening on port 3001 ✨
+# run WebSocket development server
+docker-compose up    # -> ✨ Listening on port 3001 ✨
+# run frontend development server
+cd client && yarn start
 ```
 
 ### Client side command line

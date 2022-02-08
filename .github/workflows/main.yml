@@ -30,6 +30,7 @@ jobs:
         env:
           IMAGE: ${{ secrets.DOCKER_IMAGE_TAG_NAME }}
           PLATFORM: linux/arm/v7,linux/amd64
+        working-directory: ./1st_project
         run: |
           docker buildx build --push --platform $PLATFORM -t $IMAGE:1.0.$GITHUB_RUN_NUMBER .
 

@@ -10,20 +10,28 @@ The purpose of this repository is to learn how to create video chat app on top o
 
 ---
 
-### 1st Project
+## 1st Project
 
-This is created based on tutorial on YouTube below:
+### Overview
 
-[Link](https://www.youtube.com/watch?v=oxFr7we3LC8)
+![1st project demo](/images/demo1.gif)
 
-Also I added some extra tech stacks including:
+The purpose of this project is to get a grasp on how WebRTC works. Therefore there are many spaces where I can refactor.
 
-- [TypeScript](https://www.typescriptlang.org/)
+### Approach Taken
 
-- [Vite](https://vitejs.dev/)
+Fist of all I watched [this tutorial on YouTube](https://www.youtube.com/watch?v=oxFr7we3LC8) and learn the basic logic of signaling and stream. Then I added some nice spice (below) to it
 
-- [Docker](https://www.docker.com/)
+- Rewrite code in [TypeScript](https://www.typescriptlang.org/)
 
-### 2nd Project
+- [Dockernize server](https://www.docker.com/)
 
-xxx
+- Display available user list (so that user doesn't have to type other user's ID maually)
+
+- Sign in screen / Calling screen
+
+- Small video screen that shows user itself
+
+- Audio/Vide on/off button
+
+## 2nd Project

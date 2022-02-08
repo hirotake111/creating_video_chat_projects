@@ -22,6 +22,7 @@ export default function MyVideoPlayer() {
           backgroundColor: "#222",
           display: context?.config.video ? "block" : "none",
           WebkitBackfaceVisibility: "hidden",
+          transform: "translate3d(0, 0, 0)",
         }}
       >
         <video
@@ -32,7 +33,11 @@ export default function MyVideoPlayer() {
           ref={context?.myVideo}
           width={mobile ? "100px" : "240px"}
           height={mobile ? "180px" : "120px"}
-          style={{ objectFit: "cover" }}
+          style={{
+            objectFit: "cover",
+            display: "block",
+            pointerEvents: "none",
+          }}
         />
       </Box>
     </Box>

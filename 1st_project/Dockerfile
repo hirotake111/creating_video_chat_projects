@@ -13,7 +13,6 @@ COPY src /app/src
 # Transpile TypeScript files into JavaScript
 RUN yarn build
 # Copy client codebase
-RUN env
 COPY client /app/client
 # Transpile TypeScript files into JavaScript
 RUN yarn build:fe

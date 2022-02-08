@@ -2,17 +2,13 @@ version: "3.7"
 
 services:
   server: # app
-    image: video_1st_server:0.0.1
+    image: p2p_dev
     container_name: server
     volumes:
       - type: bind
         source: ./src
         target: /app/src
-    # depends_on:
-    # - db
-    # - redis
     ports:
       - 3001:3001
     environment:
-      - "SECRETKEY=ssshhhhiiiii!"
       - "PORT=3001"

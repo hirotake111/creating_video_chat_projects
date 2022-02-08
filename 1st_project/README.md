@@ -3,14 +3,15 @@
 ### Development environment
 
 ```bash
-IMAGE="video_1st_server:0.0.1"
-REACT_APP_SERVER_URL=localhost:3001
+IMAGE="p2p_dev"
 # build image
 docker build -t $IMAGE -f Dockerfile-dev .
 
 # run WebSocket development server
 docker-compose up    # -> ✨ Listening on port 3001 ✨
 
+# create client/.env.local and add the following:
+# REACT_APP_SERVER_URL=http://localhost:3001
 
 # run frontend development server
 yarn dev:fe    # -> http://localhost:3000

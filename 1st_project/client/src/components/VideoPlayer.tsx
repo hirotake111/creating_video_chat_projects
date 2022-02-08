@@ -1,7 +1,4 @@
-import { Grid, Box } from "@mui/material";
-import Fab from "@mui/material/Fab";
-import CancelIcon from "@mui/icons-material/Cancel";
-import { pink } from "@mui/material/colors";
+import { Grid } from "@mui/material";
 
 import { useSocketContext } from "./SocketContext";
 import LeaveButton from "./LeaveButton";
@@ -23,7 +20,13 @@ export default function VideoPlayer() {
           playsInline
           autoPlay
           ref={peerVideo}
-          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          style={{
+            display: "block",
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            pointerEvents: "none",
+          }}
         />
       </Grid>
     </>

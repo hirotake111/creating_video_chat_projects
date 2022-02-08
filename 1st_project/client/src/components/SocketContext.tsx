@@ -47,7 +47,7 @@ interface ContextValues {
 }
 
 const SocketContext = createContext<ContextValues | null>(null);
-
+console.log("Server URL:", config.serverUrl);
 const socket =
   config.serverUrl.length > 4
     ? io(config.serverUrl, { autoConnect: true })

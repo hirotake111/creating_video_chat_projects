@@ -27,6 +27,7 @@ jobs:
       - name: Build and push
         env:
           TAGS: ${{ secrets.DOCKER_IMAGE_TAG_NAME }}:1.0.${{ env.GITHUB_RUN_NUMBER }}
+        working-directory: ./1st_project
         run: |
           docker build -t $TAGS . && docker push $TAGS
 

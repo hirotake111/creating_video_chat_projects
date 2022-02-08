@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   server: # app
-    image: p2p_dev
+    image: p2p_dev:latest
     container_name: server
     volumes:
       - type: bind

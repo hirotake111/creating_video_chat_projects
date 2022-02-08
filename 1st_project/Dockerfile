@@ -4,14 +4,19 @@ FROM node:14.12.0 AS builder
 # Build stage
 #
 WORKDIR /app
+# Copy json files
 COPY *.json /app/
 # Install dev modules
-# RUN npm install --also=dev
-RUN npm install --no-optional
-# Copy and compile files
+RUN yarn install
+# Copy codebase
 COPY src /app/src
-# Transpile TypeScript files
-RUN npm run build
+# Transpile TypeScript files into JavaScript
+RUN yarn build
+# Copy client codebase
+RUN env
+COPY client /app/client
+# Transpile TypeScript files into JavaScript
+RUN yarn build:fe
 
 
 #
@@ -26,12 +31,14 @@ RUN groupadd -r user && useradd --no-log-init -r -g user user
 # Copy files
 COPY package*.json ./
 # Install modules
-RUN npm install --production --no-optional
+RUN yarn install --production
 # Copy files from builder image to production image
 COPY --from=builder /app/build /app/dist
+# Copy client assets from builder to production image
+COPY --from=builder /app/client/build /app/dist/public
 # Change user
 USER user
 # Expose port
 EXPOSE 3000
 # Set the start-up command
-CMD [ "node", "dist/server.js" ]
+CMD [ "node", "dist/index.js" ]

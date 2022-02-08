@@ -21,6 +21,7 @@ export default function MyVideoPlayer() {
           overflow: "hidden",
           backgroundColor: "#222",
           display: context?.config.video ? "block" : "none",
+          WebkitBackfaceVisibility: "hidden",
         }}
       >
         <video

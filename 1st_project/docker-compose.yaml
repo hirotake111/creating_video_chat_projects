@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   server: # app
-    image: video_1st_server
+    image: video_1st_server:0.0.1
     container_name: server
     volumes:
       - type: bind

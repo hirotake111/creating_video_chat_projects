@@ -47,7 +47,12 @@ interface ContextValues {
 }
 
 const SocketContext = createContext<ContextValues | null>(null);
-const socket = io(config.serverUrl, { autoConnect: true });
+
+const socket =
+  config.serverUrl.length > 4
+    ? io(config.serverUrl, { autoConnect: true })
+    : io({ autoConnect: true });
+
 // debugging purpose
 socket.onAny((event) => {
   console.log("onAny:", { event });

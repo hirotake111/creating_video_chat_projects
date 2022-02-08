@@ -2,6 +2,8 @@ import express from "express";
 import { createServer } from "http";
 import cors from "cors";
 import { Server } from "socket.io";
+const path = require("path");
+
 import { validateAnswerMessage, validateCallUserMessage } from "./validators";
 
 const PORT = process.env.PORT || "3000";
@@ -20,6 +22,7 @@ const io = new Server(server, {
 });
 
 app.use(cors());
+app.use(express.static(path.join(__dirname, "public")));
 
 /**
  * controllers for HTTP sesrver
@@ -63,7 +66,6 @@ io.on("connection", (socket) => {
     console.log("socket.on(callUser)");
     try {
       const callUserMessage = validateCallUserMessage(message);
-      console.log(JSON.stringify(callUserMessage));
       socket.to(callUserMessage.callee.id).emit("callUser", callUserMessage);
     } catch (e) {
       // send error message back to sender

@@ -5,7 +5,10 @@
   "license": "MIT",
   "scripts": {
     "dev": "nodemon src/index.ts",
+    "dev:fe": "cd client && yarn start",
     "build": "tsc",
+    "build:fe": "cd client && yarn build",
+    "build:all": "yarn build:be  && yarn build:fe",
     "start": "node build/index.js"
   },
   "dependencies": {

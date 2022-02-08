@@ -32,7 +32,7 @@ jobs:
         with:
           push: true
 #           context: ./1st_project
-#           file: 1st_project/Dockerfile
+          file: 1st_project/Dockerfile
           tags: ${{ env.TAGS }}
 #       - name: Build and push
 #         if: success()

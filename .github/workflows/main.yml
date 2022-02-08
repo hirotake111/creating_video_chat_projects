@@ -26,7 +26,7 @@ jobs:
         with:
           push: true
           context: ./1st_project
-          tags: ${{ secrets.DOCKER_IMAGE_TAG_NAME }}:1.0.$GITHUB_RUN_NUMBER
+          tags: ${{ secrets.DOCKER_IMAGE_TAG_NAME }}:1.0.${GITHUB_RUN_NUMBER}
 #       - name: Build and push
 #         if: success()
 #         env:

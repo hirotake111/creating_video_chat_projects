@@ -24,7 +24,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2
         env:
-          TAGS: ${{ secrets.DOCKER_IMAGE_TAG_NAME }}:1.0.$GITHUB_RUN_NUMBER
+          TAGS: ${{ secrets.DOCKER_IMAGE_TAG_NAME }}:1.0.${{ env.GITHUB_RUN_NUMBER }}
         with:
           push: true
           context: ./1st_project

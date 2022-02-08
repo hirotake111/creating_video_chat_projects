@@ -28,7 +28,7 @@ jobs:
         with:
           push: true
           context: ./1st_project
-          tags: ${{ TAGS }}
+          tags: $TAGS
 #       - name: Build and push
 #         if: success()
 #         env:

@@ -31,8 +31,8 @@ jobs:
           TAGS: ${{ secrets.DOCKER_IMAGE_TAG_NAME }}:1.0.${{ env.GITHUB_RUN_NUMBER }}
         with:
           push: true
-          context: ./1st_project
-          file: 1st_project/Dockerfile
+#           context: ./1st_project
+#           file: 1st_project/Dockerfile
           tags: ${{ env.TAGS }}
 #       - name: Build and push
 #         if: success()

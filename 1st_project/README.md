@@ -19,7 +19,12 @@ yarn dev:fe    # -> http://localhost:3000
 
 ### Production environment
 
+You can just include "#BUILD" in your commit message and push it to your GitHub repo. Then GitHub Actions will create and push new one for you.
+
 ```bash
+#
+# Build image manually
+#
 IMAGE=<image name>
 
 # build image

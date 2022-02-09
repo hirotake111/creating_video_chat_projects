@@ -4,7 +4,6 @@ import { teal, lightGreen } from "@mui/material/colors";
 import { ThemeProvider } from "@mui/system";
 
 import "./App.css";
-import Notifications from "./components/Notifications";
 import VideoPlayer from "./components/VideoPlayer";
 import MyVideoPlayer from "./components/MyVideoPlayer";
 import Landing from "./components/Landing";
@@ -32,35 +31,7 @@ export default function App() {
           <CustomSpeedDial />
           <MyVideoPlayer />
           <VideoPlayer />
-          {/* <Box
-              sx={{ display: "flex", flexDirection: "column", width: "360px" }}
-            >
-              <Box sx={{ flex: 1, transition: "1s" }}>
-                <SettingsPane />
-              </Box>
-              <Box
-                sx={{
-                  flex: 1,
-                  borderTop: "1px solid #e0e0e0",
-                  borderBottom: "1px solid #e0e0e0",
-                }}
-              >
-                <UserList />
-              </Box>
-            </Box> */}
         </Box>
-        {/* <Box
-            aria-label="controllers"
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "128px",
-            }}
-          >
-            <VideoController />
-          </Box> */}
-        <Notifications />
       </div>
     </ThemeProvider>
   );

@@ -1,4 +1,4 @@
-import { Box, TextField } from "@mui/material";
+import { Box, TextField, useMediaQuery } from "@mui/material";
 import { FormEventHandler, useEffect, useRef } from "react";
 
 import { useSocketContext } from "./SocketContext";
@@ -6,6 +6,7 @@ import { useSocketContext } from "./SocketContext";
 export default function Landing() {
   const context = useSocketContext();
   const ref = useRef<HTMLInputElement>(null);
+  const mobile = useMediaQuery("(max-width:480px)");
 
   useEffect(() => {
     ref.current?.focus();
@@ -32,7 +33,8 @@ export default function Landing() {
       sx={{
         display: "flex",
         justifyContent: "center",
-        alignItems: "center",
+        alignItems: mobile ? "start" : "center",
+        paddingTop: mobile ? "100px" : 0,
         width: "100vw",
         height: context?.callStatus.type !== "notSignedIn" ? "0%" : "100%",
         transition: "0.3s",

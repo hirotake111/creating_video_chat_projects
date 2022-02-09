@@ -26,7 +26,7 @@ Fist of all I watched [this tutorial on YouTube](https://www.youtube.com/watch?v
 
 - [Dockernize server](https://www.docker.com/)
 
-- GitHub Actions to automatically create/push Docker image (with multi-archtecture)
+- GitHub Actions to automatically create/push Docker image
 
 - Display available user list (so that user doesn't have to type other user's ID maually)
 

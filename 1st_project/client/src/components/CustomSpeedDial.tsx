@@ -15,7 +15,6 @@ export default function CustomSpeedDial() {
     config: { audio, video },
     switchVideo,
     switchAudio,
-    stream,
     callStatus,
   } = context;
 

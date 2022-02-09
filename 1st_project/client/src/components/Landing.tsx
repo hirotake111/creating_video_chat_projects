@@ -1,5 +1,5 @@
 import { Box, TextField } from "@mui/material";
-import { FormEventHandler, useEffect, useMemo, useRef } from "react";
+import { FormEventHandler, useEffect, useRef } from "react";
 
 import { useSocketContext } from "./SocketContext";
 
@@ -25,11 +25,6 @@ export default function Landing() {
     setName(ref.current.value);
     setCallStatus({ type: "available" });
   };
-
-  const signedIn = useMemo(
-    () => context?.callStatus.type !== "notSignedIn",
-    [context?.callStatus]
-  );
 
   return (
     <Box

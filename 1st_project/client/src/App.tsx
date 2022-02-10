@@ -6,7 +6,7 @@ import { ThemeProvider } from "@mui/system";
 import "./App.css";
 import VideoPlayer from "./components/VideoPlayer";
 import MyVideoPlayer from "./components/MyVideoPlayer";
-import Landing from "./components/Landing";
+import SignIn from "./components/SignIn";
 import UserList from "./components/UserList";
 import CustomAppBar from "./components/CustomAppbar";
 import CustomSpeedDial from "./components/CustomSpeedDial";
@@ -24,7 +24,7 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <div className="app">
         <CustomAppBar />
-        <Landing />
+        <SignIn />
         <UserList />
         <CallingScreen />
         <Box sx={{ display: "flex", width: "100%", height: "100%" }}>

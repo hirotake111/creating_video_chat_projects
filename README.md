@@ -1,4 +1,4 @@
-# Creating Video Chat App Projects
+# Projects - Create Video Chat App
 
 ## Overview
 
@@ -37,3 +37,13 @@ Fist of all I watched [this tutorial on YouTube](https://www.youtube.com/watch?v
 - Audio/Vide on/off button
 
 ## 2nd Project
+
+### TODO
+
+- Multiple users can join one meeting (not P2P, use TURN server)
+
+- Participants can send chat messages
+
+- Authentication (in order to create a meeting)
+
+- But anyone can join meeting (using meeting link)

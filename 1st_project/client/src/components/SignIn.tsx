@@ -3,7 +3,7 @@ import { FormEventHandler, useEffect, useRef } from "react";
 
 import { useSocketContext } from "./SocketContext";
 
-export default function Landing() {
+export default function SignIn() {
   const context = useSocketContext();
   const ref = useRef<HTMLInputElement>(null);
   const mobile = useMediaQuery("(max-width:480px)");
@@ -31,20 +31,26 @@ export default function Landing() {
     <Box
       aria-label="sign in"
       sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: mobile ? "start" : "center",
-        paddingTop: mobile ? "100px" : 0,
-        width: "100vw",
         height: context?.callStatus.type !== "notSignedIn" ? "0%" : "100%",
-        transition: "0.3s",
       }}
     >
-      {!(context?.callStatus.type !== "notSignedIn") && (
-        <form onSubmit={handleChange}>
-          <TextField label="Enter Your Name" inputRef={ref} focused />
-        </form>
-      )}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: mobile ? "start" : "center",
+          paddingTop: mobile ? "100px" : 0,
+          width: "100vw",
+          height: "100%",
+          transition: "0.3s",
+        }}
+      >
+        {!(context?.callStatus.type !== "notSignedIn") && (
+          <form onSubmit={handleChange}>
+            <TextField label="Enter Your Name" inputRef={ref} focused />
+          </form>
+        )}
+      </Box>
     </Box>
   );
 }

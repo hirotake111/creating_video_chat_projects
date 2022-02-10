@@ -3,8 +3,8 @@
 ### Development environment
 
 ```bash
-IMAGE="p2p_dev"
 # build image
+IMAGE="p2p_dev"
 docker build -t $IMAGE -f Dockerfile-dev .
 
 # run WebSocket development server

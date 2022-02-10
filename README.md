@@ -1,4 +1,4 @@
-# Projects - Create Video Chat App
+# Projects - Create 🎥 Video Chat App 🎥
 
 ## Overview
 
@@ -10,13 +10,13 @@ The purpose of this repository is to learn how to create video chat app on top o
 
 ---
 
-## 1st Project
+## 🎉 1st Project 🎉
 
 ### Overview
 
 ![1st project demo](/images/demo_1.gif)
 
-The purpose of this project is to get a grasp on how WebRTC works. Therefore there are many spaces where I can refactor.
+The purpose of this project is to get a grasp on how WebRTC works. Therefore there are many spaces I should refactor.
 
 ### Approach Taken
 
@@ -34,9 +34,9 @@ Fist of all I watched [this tutorial on YouTube](https://www.youtube.com/watch?v
 
 - Small video screen that shows user itself
 
-- Audio/Vide on/off button
+- Audio/Video on/off button
 
-## 2nd Project
+## 🎉 2nd Project 🎉
 
 ### TODO
 

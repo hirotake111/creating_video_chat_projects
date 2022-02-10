@@ -14,7 +14,7 @@ The purpose of this repository is to learn how to create video chat app on top o
 
 ### Overview
 
-![1st project demo](/images/demo1.gif)
+![1st project demo](/images/demo_1.gif)
 
 The purpose of this project is to get a grasp on how WebRTC works. Therefore there are many spaces where I can refactor.
 

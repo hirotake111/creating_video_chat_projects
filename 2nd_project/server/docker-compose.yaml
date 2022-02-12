@@ -10,5 +10,13 @@ services:
         target: /app/src
     ports:
       - 3000:3000
-    # environment:
-    #   - "PORT=3000"
+    environment:
+      - "DATABASE_URL=postgresql://postgres:secret@video_db:5432/video_chat?schema=public"
+
+  video_db: # PostgreSQL
+    image: postgres:14.2
+    container_name: video_db
+    environment:
+      - "POSTGRES_USER=postgres"
+      - "POSTGRES_PASSWORD=secret"
+      - "POSTGRES_DB=video_chat"

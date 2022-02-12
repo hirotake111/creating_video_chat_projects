@@ -29,6 +29,7 @@ COPY package*.json ./
 RUN yarn install --production
 # Copy files from builder image to production image
 COPY --from=builder /app/dist /app/dist
+# COPY prisma /app/prisma
 # Change user
 USER user
 # Expose port

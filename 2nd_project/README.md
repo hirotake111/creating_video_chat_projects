@@ -8,8 +8,13 @@
 # Build development Docker image
 IMAGE=video_dev
 docker build -t $IMAGE -f ./Dockerfile-dev .
+# Database migration
+docker-compose run --rm $IMAGE npx prisma migrate dev --name init
 # Run development server
-docker-compose up -d video_dev
+docker-compose up video_dev
+
+# Access database manually
+docker-compose exec video_db psql --username=postgres video_chat
 ```
 
 ### Client (Next.js)

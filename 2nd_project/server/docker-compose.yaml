@@ -8,10 +8,15 @@ services:
       - type: bind
         source: ./src
         target: /app/src
+      - type: bind
+        source: ./prisma
+        target: /app/prisma
     ports:
       - 3000:3000
     environment:
       - "DATABASE_URL=postgresql://postgres:secret@video_db:5432/video_chat?schema=public"
+    depends_on:
+      - video_db
 
   video_db: # PostgreSQL
     image: postgres:14.2

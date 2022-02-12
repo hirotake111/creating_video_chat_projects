@@ -11,4 +11,7 @@ RUN yarn
 
 # Copy and compile files
 COPY src ./src
+COPY prisma ./prisma
+# Run migration
+RUN npx prisma generate
 CMD [ "yarn", "dev" ]

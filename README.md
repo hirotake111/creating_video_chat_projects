@@ -38,6 +38,10 @@ Fist of all I watched [this tutorial on YouTube](https://www.youtube.com/watch?v
 
 ## 🎉 2nd Project 🎉
 
+### Overview
+
+This project aims to create a production-level video chat app including server side implementation.
+
 ### TODO
 
 - Multiple users can join one meeting (not P2P, use TURN server)
